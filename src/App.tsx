@@ -397,7 +397,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [37, 35, 32, 30, 27],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [42, 40, 37, 35, 32],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [42, 39, 37, 35, 32],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [36, 34, 32, 30, 27],
     },
     {
@@ -470,7 +485,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [35, 32, 30, 27, 25],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [40, 37, 35, 32, 30],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [39, 37, 35, 32, 30],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [34, 32, 30, 27, 25],
     },
     {
@@ -543,7 +573,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [32, 30, 27, 25, 22],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [37, 35, 32, 30, 27],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [37, 35, 32, 30, 27],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [32, 30, 27, 25, 23],
     },
     {
@@ -616,7 +661,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [30, 27, 25, 25, 25],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [35, 32, 30, 30, 30],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [35, 32, 30, 30, 30],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [27, 25, 23, 23, 23],
     },
     {
@@ -689,7 +749,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [27, 25, 22, 20, 17],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [32, 30, 27, 25, 22],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [32, 30, 27, 25, 22],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [25, 23, 21, 21, 18],
     },
     {
@@ -762,7 +837,22 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '増強',
-      antenna: '単体増強系',
+      antenna: 'すこしこうふん',
+      hp: [25, 22, 20, 17, 15],
+    },
+    {
+      category: '〃',
+      antenna: 'すこしむてき',
+      hp: [30, 27, 25, 22, 20],
+    },
+    {
+      category: '〃',
+      antenna: 'たくわえる',
+      hp: [30, 27, 25, 22, 20],
+    },
+    {
+      category: '〃',
+      antenna: 'その他単体増強系',
       hp: [23, 21, 21, 18, 16],
     },
     {
@@ -788,8 +878,8 @@ const BODY_TABLE_EXCEPTIONS: Record<string, string> = {
   'ノックダウン':
     '回避率+1',
 
-  '単体増強系':
-    '該当アンテナ：すこしはやくなれ すこしつよくなれ すこしかたくなれ すこしかわしやすい すこしこうふん すこしむてき たくわえる\n「すこしかわしやすい」は回避率+2',
+  'その他単体増強系':
+    '該当アンテナ：すこしはやくなれ すこしつよくなれ すこしかたくなれ すこしかわしやすい\n「すこしかわしやすい」は回避率+2',
 
   '単体補助系':
     '該当アンテナ：すこしねむらせる すこししびれさせる すこしおそくなれ すこしやわくなれ すこしめかくし どくになれ みんなすこしよけにくい\n「みんなすこしよけにくい」は回避率+4',
@@ -1048,7 +1138,16 @@ function Save({
     } else if (antenna === 'ぞくせいなおす') {
       setAntennaCategory('治療')
       setAntenna('ぞくせいなおす')
-    } else if (antenna === '単体増強系') {
+    } else if (antenna === 'すこしこうふん') {
+      setAntennaCategory('増強')
+      setAntenna('すこしこうふん')
+    } else if (antenna === 'すこしむてき') {
+      setAntennaCategory('増強')
+      setAntenna('すこしむてき')
+    } else if (antenna === 'たくわえる') {
+      setAntennaCategory('増強')
+      setAntenna('たくわえる')
+    } else if (antenna === 'その他単体増強系') {
       setAntennaCategory('増強')
       setAntenna('すこしはやくなれ')
     } else if (antenna === '単体補助系') {
@@ -1639,7 +1738,7 @@ function Edit({
     denpa?.qrFile ?? null
   )
   const [bodyTableEvasion, setBodyTableEvasion] = useState(
-    denpa?.evasion ?? '0'
+    denpa?.evasion || EVASION_OPTIONS[0]
   )
 
   const [hoveredCell, setHoveredCell] = useState<{
@@ -1689,7 +1788,16 @@ function Edit({
     } else if (antenna === 'ぞくせいなおす') {
       setAntennaCategory('治療')
       setAntenna('ぞくせいなおす')
-    } else if (antenna === '単体増強系') {
+    } else if (antenna === 'すこしこうふん') {
+      setAntennaCategory('増強')
+      setAntenna('すこしこうふん')
+    } else if (antenna === 'すこしむてき') {
+      setAntennaCategory('増強')
+      setAntenna('すこしむてき')
+    } else if (antenna === 'たくわえる') {
+      setAntennaCategory('増強')
+      setAntenna('たくわえる')
+    } else if (antenna === 'その他単体増強系') {
       setAntennaCategory('増強')
       setAntenna('すこしはやくなれ')
     } else if (antenna === '単体補助系') {
@@ -1792,13 +1900,15 @@ function Edit({
                     }}
                   />
 
-                  {qrFile && (
-                    <img
-                      className="qr-preview"
-                      src={URL.createObjectURL(qrFile)}
-                      alt="QRコード"
-                    />
-                  )}
+                  <img
+                    className="qr-preview"
+                    src={
+                      qrFile
+                        ? URL.createObjectURL(qrFile)
+                        : '/denpa-qr-web/no-image.jpg'
+                    }
+                    alt={qrFile ? 'QRコード' : 'QRコード未設定'}
+                  />
 
                 </div>
 
@@ -4048,7 +4158,7 @@ function Search({
                                     src={
                                       denpa.qrFile
                                         ? URL.createObjectURL(denpa.qrFile)
-                                        : '/no-image.jpg'
+                                        : '/denpa-qr-web/no-image.jpg'
                                     }
                                     alt={
                                       denpa.qrFile
