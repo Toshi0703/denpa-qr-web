@@ -4326,7 +4326,7 @@ function App() {
   }, [denpaList, isDenpaListLoaded])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/denpa-qr-web">
       <Routes>
 
         <Route
