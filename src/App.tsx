@@ -11,9 +11,6 @@ import {
 import './App.css'
 import QRCode from 'qrcode'
 
-import Papa from 'papaparse'
-import JSZip from 'jszip'
-
 type DenpaData = {
   id: string
   name: string
@@ -377,148 +374,6 @@ const restoreBackupFile = (
   reader.readAsText(file)
 }
 
-const getColorCategory = (color: string): string => {
-  for (const [category, options] of Object.entries(COLOR_OPTIONS)) {
-    if (options.includes(color)) {
-      return category
-    }
-  }
-
-  return ''
-}
-
-const getAntennaCategory = (antenna: string): string => {
-  for (const [category, options] of Object.entries(ANTENNA_OPTIONS)) {
-    if (options.includes(antenna)) {
-      return category
-    }
-  }
-
-  return ''
-}
-
-const convertEvasion = (evasion: string): string => {
-  if (evasion === '0') {
-    return '0'
-  }
-
-  if (evasion === '3+') {
-    return '3+'
-  }
-
-  if (evasion === '3-') {
-    return '3-'
-  }
-
-  if (evasion === '6') {
-    return '6'
-  }
-
-  if (evasion === '10') {
-    return '6-10'
-  }
-
-  if (evasion === '15') {
-    return '10-15'
-  }
-
-  return evasion
-}
-
-const importColabData = async (
-  csvFile: File,
-  zipFile: File,
-  denpaList: DenpaData[]
-): Promise<DenpaData[]> => {
-  const csvText = await csvFile.text()
-
-  const csvResult = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: true,
-  })
-
-  if (csvResult.errors.length > 0) {
-    throw new Error('CSVの読み込みに失敗しました。')
-  }
-
-  const zip = await JSZip.loadAsync(zipFile)
-
-  const importedData: DenpaData[] = []
-
-  for (const row of csvResult.data) {
-    const qrFileName = row['QR']
-
-    let qrFile: File | null = null
-
-    if (qrFileName) {
-      let zipEntry = zip.file(qrFileName)
-
-      if (!zipEntry) {
-        const matchingPath = Object.keys(zip.files).find(
-          (path) => path.endsWith(`/${qrFileName}`)
-        )
-
-        if (matchingPath) {
-          zipEntry = zip.file(matchingPath)
-        }
-      }
-
-      if (zipEntry) {
-        const blob = await zipEntry.async('blob')
-
-        qrFile = new File(
-          [blob],
-          qrFileName,
-          { type: blob.type || 'image/png' }
-        )
-      }
-    }
-
-    importedData.push({
-      id: row['id'],
-      name: row['名前'],
-      evasion: convertEvasion(row['回避率']),
-      body: row['体格'],
-      colorCategory: getColorCategory(row['色']),
-      color: row['色'],
-      head: row['頭'],
-      antennaCategory: getAntennaCategory(row['アンテナ']),
-      antenna: row['アンテナ'],
-      feature: row['特徴'],
-      capture: row['捕獲'] === 'True',
-      favorite: row['お気に入り'] === 'True',
-      createdAt: Date.now(),
-      qrFile,
-    })
-  }
-
-  const mergedData = denpaList.map((existing) => {
-    const imported = importedData.find(
-      (denpa) => denpa.id === existing.id
-    )
-
-    if (!imported) {
-      return existing
-    }
-
-    return {
-      ...existing,
-      ...imported,
-    }
-  })
-
-  const newData = importedData.filter(
-    (denpa) => !denpaList.some(
-      (existing) => existing.id === denpa.id
-    )
-  )
-
-  return [
-    ...mergedData,
-    ...newData,
-  ]
-}
-
 type SearchMatch = {
   required: string[]
   optional: string[]
@@ -680,7 +535,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [37, 35, 32, 30, 27],
     },
     {
@@ -768,7 +623,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [35, 32, 30, 27, 25],
     },
     {
@@ -856,7 +711,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [32, 30, 27, 25, 22],
     },
     {
@@ -944,7 +799,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [30, 27, 25, 25, 25],
     },
     {
@@ -1032,7 +887,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [27, 25, 22, 20, 17],
     },
     {
@@ -1120,7 +975,7 @@ const BODY_TABLE_DATA: Record<
     },
     {
       category: '補助',
-      antenna: '単体補助系',
+      antenna: '補助系',
       hp: [25, 22, 20, 17, 15],
     },
     {
@@ -1144,7 +999,7 @@ const BODY_TABLE_EXCEPTIONS: Record<string, string> = {
   'その他単体増強系':
     '該当アンテナ：すこしはやくなれ すこしつよくなれ すこしかたくなれ すこしかわしやすい\n「すこしかわしやすい」は回避率+2',
 
-  '単体補助系':
+  '補助系':
     '該当アンテナ：すこしねむらせる すこししびれさせる すこしおそくなれ すこしやわくなれ すこしめかくし どくになれ みんなすこしよけにくい\n「みんなすこしよけにくい」は回避率+4',
 
   'ちょっとあしもとガード':
@@ -1167,9 +1022,6 @@ function Home({
   setSearchConditions: Dispatch<SetStateAction<SearchCondition[]>>
 }) {
   const [backupFile, setBackupFile] = useState<File | null>(null)
-
-  const [colabCsvFile, setColabCsvFile] = useState<File | null>(null)
-  const [colabZipFile, setColabZipFile] = useState<File | null>(null)
 
   return (
     <div className="app">
@@ -1234,59 +1086,6 @@ function Home({
             }}
           />
 
-        </div>
-
-        <div className="home-import">
-          <h3>Colab版データを追加</h3>
-
-          <input
-            type="file"
-            accept=".csv"
-            onChange={(e) => {
-              const file = e.target.files?.[0] ?? null
-              setColabCsvFile(file)
-            }}
-          />
-
-          <input
-            type="file"
-            accept=".zip"
-            onChange={(e) => {
-              const file = e.target.files?.[0] ?? null
-              setColabZipFile(file)
-            }}
-          />
-
-          <button
-            onClick={async () => {
-              if (!colabCsvFile || !colabZipFile) {
-                alert('CSVファイルとQR画像ZIPファイルを選択してください。')
-                return
-              }
-
-              try {
-                const importedData = await importColabData(
-                  colabCsvFile,
-                  colabZipFile,
-                  denpaList
-                )
-
-                setDenpaList(importedData)
-
-                alert(
-                  `${importedData.length}件のデータを移行しました。`
-                )
-
-                setColabCsvFile(null)
-                setColabZipFile(null)
-              } catch (error) {
-                console.error(error)
-                alert('データの移行に失敗しました。')
-              }
-            }}
-          >
-            移行する
-          </button>
         </div>
 
         <div className="home-menu">
@@ -1469,7 +1268,7 @@ function Save({
     } else if (antenna === 'その他単体増強系') {
       setAntennaCategory('増強')
       setAntenna('すこしはやくなれ')
-    } else if (antenna === '単体補助系') {
+    } else if (antenna === '補助系') {
       setAntennaCategory('補助')
       setAntenna('すこしねむらせる')
     } else if (antenna === 'ちょっとあしもとガード') {
@@ -1854,12 +1653,23 @@ function Save({
 
                     <select
                       value={antenna}
-                      onChange={(e) => setAntenna(e.target.value)}
+                      onChange={(e) =>
+                        setAntenna(e.target.value)
+                      }
                       disabled={!antennaCategory}
                     >
+                      <option value="">
+                        未設定
+                      </option>
+
                       {antennaCategory &&
-                        ANTENNA_OPTIONS[antennaCategory]?.map((item) => (
-                          <option key={item} value={item}>
+                        ANTENNA_OPTIONS[
+                          antennaCategory
+                        ].map((item) => (
+                          <option
+                            key={item}
+                            value={item}
+                          >
                             {item}
                           </option>
                         ))}
@@ -2126,7 +1936,7 @@ function Edit({
     } else if (antenna === 'その他単体増強系') {
       setAntennaCategory('増強')
       setAntenna('すこしはやくなれ')
-    } else if (antenna === '単体補助系') {
+    } else if (antenna === '補助系') {
       setAntennaCategory('補助')
       setAntenna('すこしねむらせる')
     } else if (antenna === 'ちょっとあしもとガード') {
@@ -2153,6 +1963,50 @@ function Edit({
   }
 
   const handleUpdate = () => {
+    const unsetItems: string[] = []
+
+    if (!name) {
+      unsetItems.push('名前')
+    }
+
+    if (!evasion) {
+      unsetItems.push('回避率')
+    }
+
+    if (!body) {
+      unsetItems.push('体格')
+    }
+
+    if (!colorCategory || !color) {
+      unsetItems.push('色')
+    }
+
+    if (!head) {
+      unsetItems.push('頭')
+    }
+
+    if (!antennaCategory || !antenna) {
+      unsetItems.push('アンテナ')
+    }
+
+    if (!feature) {
+      unsetItems.push('特徴')
+    }
+
+    if (!qrFile) {
+      unsetItems.push('QRコード')
+    }
+
+    if (unsetItems.length > 0) {
+      const shouldUpdate = window.confirm(
+        `${unsetItems.join('、')}が設定されていません。\n\n更新しますか？`
+      )
+
+      if (!shouldUpdate) {
+        return false
+      }
+    }
+
     setDenpaList((currentList) =>
       currentList.map((item) =>
         item.id === denpa.id
@@ -2172,6 +2026,8 @@ function Edit({
           : item
       )
     )
+
+    return true
   }
 
   return (
@@ -2180,6 +2036,7 @@ function Edit({
 
         <div className="save-title">
           <button
+            type="button"
             className="search-back-button"
             onClick={() => {
               navigate('/search', {
@@ -2324,18 +2181,17 @@ function Edit({
                     <select
                       value={colorCategory}
                       onChange={(e) => {
-                        const newCategory =
-                          e.target.value
+                        const newCategory = e.target.value
 
-                        setColorCategory(
-                          newCategory
-                        )
+                        setColorCategory(newCategory)
 
-                        setColor(
-                          COLOR_OPTIONS[
-                          newCategory
-                          ][0]
-                        )
+                        if (newCategory === '') {
+                          setColor('')
+                        } else {
+                          setColor(
+                            COLOR_OPTIONS[newCategory][0]
+                          )
+                        }
                       }}
                     >
                       <option value="">
@@ -2363,6 +2219,7 @@ function Edit({
                       }
                       disabled={!colorCategory}
                     >
+
                       {colorCategory &&
                         COLOR_OPTIONS[colorCategory]?.map((item) => (
                           <option
@@ -2412,18 +2269,17 @@ function Edit({
                     <select
                       value={antennaCategory}
                       onChange={(e) => {
-                        const newCategory =
-                          e.target.value
+                        const newCategory = e.target.value
 
-                        setAntennaCategory(
-                          newCategory
-                        )
+                        setAntennaCategory(newCategory)
 
-                        setAntenna(
-                          ANTENNA_OPTIONS[
-                          newCategory
-                          ][0]
-                        )
+                        if (newCategory === '') {
+                          setAntenna('')
+                        } else {
+                          setAntenna(
+                            ANTENNA_OPTIONS[newCategory][0]
+                          )
+                        }
                       }}
                     >
                       <option value="">
@@ -2451,6 +2307,7 @@ function Edit({
                       }
                       disabled={!antennaCategory}
                     >
+
                       {antennaCategory &&
                         ANTENNA_OPTIONS[
                           antennaCategory
@@ -2502,7 +2359,11 @@ function Edit({
                   type="button"
                   className="save-button"
                   onClick={() => {
-                    handleUpdate()
+                    const updated = handleUpdate()
+
+                    if (!updated) {
+                      return
+                    }
 
                     navigate('/search', {
                       state: searchPageState
@@ -3111,13 +2972,13 @@ function Search({
     setAntenna('')
     setFeature('')
 
-    setNameRequired(false)
-    setEvasionRequired(false)
-    setBodyRequired(false)
-    setColorRequired(false)
-    setHeadRequired(false)
-    setAntennaRequired(false)
-    setFeatureRequired(false)
+    setNameRequired(true)
+    setEvasionRequired(true)
+    setBodyRequired(true)
+    setColorRequired(true)
+    setHeadRequired(true)
+    setAntennaRequired(true)
+    setFeatureRequired(true)
 
     setOptionalMin(0)
   }
@@ -4367,9 +4228,9 @@ function Search({
                                     '色'
                                   )}
                                 >
-                                  {denpa.colorCategory}
+                                  {denpa.colorCategory || '未設定'}
                                   {' ＞ '}
-                                  {denpa.color}
+                                  {denpa.color || '未設定'}
                                 </span>
                               </p>
 
@@ -4392,9 +4253,9 @@ function Search({
                                     'アンテナ'
                                   )}
                                 >
-                                  {denpa.antennaCategory}
+                                  {denpa.antennaCategory || '未設定'}
                                   {' ＞ '}
-                                  {denpa.antenna}
+                                  {denpa.antenna || '未設定'}
                                 </span>
                               </p>
 
