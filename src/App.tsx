@@ -1108,6 +1108,9 @@ function QrHistory({
 }: {
   qrHistory: QrHistory[]
 }) {
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [page, setPage] = useState(1)
 
   const itemsPerPage = 15
@@ -1124,10 +1127,14 @@ function QrHistory({
         <button
           className="search-back-button"
           onClick={() => {
-            window.history.back()
+            navigate('/save', {
+              state: {
+                qrMode: location.state?.qrMode ?? 'select',
+              },
+            })
           }}
         >
-          ←
+          ⇦
         </button>
 
         <h2>QRコード生成履歴（直近300個）</h2>
@@ -1204,7 +1211,13 @@ function Save({
   const [antenna, setAntenna] = useState('')
   const [feature, setFeature] = useState('')
   const [qrFile, setQrFile] = useState<File | null>(null)
-  const [qrMode, setQrMode] = useState<'select' | 'generate'>('select')
+  const location = useLocation()
+
+  const [qrMode, setQrMode] =
+    useState<'select' | 'generate'>(
+      location.state?.qrMode ?? 'select'
+    )
+    
   const [generatedQr, setGeneratedQr] = useState<string | null>(null)
   const [qrLength, setQrLength] = useState(100)
   const [qrDecided, setQrDecided] = useState(false)
@@ -1349,6 +1362,16 @@ function Save({
     console.log(denpaData)
 
     alert('新しい電波人間のデータを登録しました。')
+
+    setName('')
+    setEvasion('')
+    setBody('')
+    setColorCategory('')
+    setColor('')
+    setHead('')
+    setAntennaCategory('')
+    setAntenna('')
+    setFeature('')
   }
 
 
@@ -1501,7 +1524,13 @@ function Save({
                     </button>
 
                     <button
-                      onClick={() => navigate('/qr-history')}
+                      onClick={() =>
+                        navigate('/qr-history', {
+                          state: {
+                            qrMode,
+                          },
+                        })
+                      }
                     >
                       履歴（直近300個）
                     </button>
@@ -1581,7 +1610,11 @@ function Save({
                       onChange={(e) => {
                         const newCategory = e.target.value
                         setColorCategory(newCategory)
-                        setColor(COLOR_OPTIONS[newCategory][0])
+                        if (newCategory === '') {
+                          setColor('')
+                        } else {
+                          setColor(COLOR_OPTIONS[newCategory][0])
+                        }
                       }}
                     >
                       <option value="">選択してください</option>
@@ -1637,7 +1670,11 @@ function Save({
                       onChange={(e) => {
                         const newCategory = e.target.value
                         setAntennaCategory(newCategory)
-                        setAntenna(ANTENNA_OPTIONS[newCategory][0])
+                        if (newCategory === '') {
+                          setAntenna('')
+                        } else {
+                          setAntenna(ANTENNA_OPTIONS[newCategory][0])
+                        }
                       }}
                     >
                       <option value="">選択してください</option>
@@ -1658,9 +1695,6 @@ function Save({
                       }
                       disabled={!antennaCategory}
                     >
-                      <option value="">
-                        未設定
-                      </option>
 
                       {antennaCategory &&
                         ANTENNA_OPTIONS[
