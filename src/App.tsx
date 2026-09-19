@@ -11,6 +11,9 @@ import {
 import './App.css'
 import QRCode from 'qrcode'
 
+import Papa from 'papaparse'
+import JSZip from 'jszip'
+
 type DenpaData = {
   id: string
   name: string
@@ -99,6 +102,124 @@ type QrHistory = {
   id: string
   qrData: string
   createdAt: number
+}
+
+const QR_DB_NAME = 'denpaQrDatabase'
+const QR_STORE_NAME = 'qrFiles'
+
+const openQrDatabase = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(QR_DB_NAME, 1)
+
+    request.onupgradeneeded = () => {
+      const db = request.result
+
+      if (!db.objectStoreNames.contains(QR_STORE_NAME)) {
+        db.createObjectStore(QR_STORE_NAME)
+      }
+    }
+
+    request.onsuccess = () => {
+      resolve(request.result)
+    }
+
+    request.onerror = () => {
+      reject(request.error)
+    }
+  })
+}
+
+const saveQrFile = async (
+  id: string,
+  file: File
+): Promise<void> => {
+  const db = await openQrDatabase()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(
+      QR_STORE_NAME,
+      'readwrite'
+    )
+
+    const store = transaction.objectStore(QR_STORE_NAME)
+
+    store.put(file, id)
+
+    transaction.oncomplete = () => {
+      db.close()
+      resolve()
+    }
+
+    transaction.onerror = () => {
+      db.close()
+      reject(transaction.error)
+    }
+  })
+}
+
+const getQrFile = async (
+  id: string
+): Promise<File | null> => {
+  const db = await openQrDatabase()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(
+      QR_STORE_NAME,
+      'readonly'
+    )
+
+    const store = transaction.objectStore(QR_STORE_NAME)
+    const request = store.get(id)
+
+    request.onsuccess = () => {
+      db.close()
+
+      const file = request.result
+
+      if (file instanceof File) {
+        resolve(file)
+        return
+      }
+
+      if (file instanceof Blob) {
+        resolve(
+          new File(
+            [file],
+            `${id}.png`,
+            { type: file.type || 'image/png' }
+          )
+        )
+        return
+      }
+
+      resolve(null)
+    }
+
+    request.onerror = () => {
+      db.close()
+      reject(request.error)
+    }
+  })
+}
+
+const saveDenpaList = async (
+  denpaList: DenpaData[]
+): Promise<void> => {
+  const savedData = denpaList.map((denpa) => ({
+    ...denpa,
+    qrFile: null,
+  }))
+
+  for (const denpa of denpaList) {
+    if (denpa.qrFile) {
+      await saveQrFile(denpa.id, denpa.qrFile)
+    }
+  }
+
+  localStorage.setItem(
+    'denpaList',
+    JSON.stringify(savedData)
+  )
 }
 
 const fileToDataUrl = (
@@ -254,6 +375,148 @@ const restoreBackupFile = (
   }
 
   reader.readAsText(file)
+}
+
+const getColorCategory = (color: string): string => {
+  for (const [category, options] of Object.entries(COLOR_OPTIONS)) {
+    if (options.includes(color)) {
+      return category
+    }
+  }
+
+  return ''
+}
+
+const getAntennaCategory = (antenna: string): string => {
+  for (const [category, options] of Object.entries(ANTENNA_OPTIONS)) {
+    if (options.includes(antenna)) {
+      return category
+    }
+  }
+
+  return ''
+}
+
+const convertEvasion = (evasion: string): string => {
+  if (evasion === '0') {
+    return '0'
+  }
+
+  if (evasion === '3+') {
+    return '3+'
+  }
+
+  if (evasion === '3-') {
+    return '3-'
+  }
+
+  if (evasion === '6') {
+    return '6'
+  }
+
+  if (evasion === '10') {
+    return '6-10'
+  }
+
+  if (evasion === '15') {
+    return '10-15'
+  }
+
+  return evasion
+}
+
+const importColabData = async (
+  csvFile: File,
+  zipFile: File,
+  denpaList: DenpaData[]
+): Promise<DenpaData[]> => {
+  const csvText = await csvFile.text()
+
+  const csvResult = Papa.parse<Record<string, string>>(csvText, {
+    header: true,
+    skipEmptyLines: true,
+  })
+
+  if (csvResult.errors.length > 0) {
+    throw new Error('CSVの読み込みに失敗しました。')
+  }
+
+  const zip = await JSZip.loadAsync(zipFile)
+
+  const importedData: DenpaData[] = []
+
+  for (const row of csvResult.data) {
+    const qrFileName = row['QR']
+
+    let qrFile: File | null = null
+
+    if (qrFileName) {
+      let zipEntry = zip.file(qrFileName)
+
+      if (!zipEntry) {
+        const matchingPath = Object.keys(zip.files).find(
+          (path) => path.endsWith(`/${qrFileName}`)
+        )
+
+        if (matchingPath) {
+          zipEntry = zip.file(matchingPath)
+        }
+      }
+
+      if (zipEntry) {
+        const blob = await zipEntry.async('blob')
+
+        qrFile = new File(
+          [blob],
+          qrFileName,
+          { type: blob.type || 'image/png' }
+        )
+      }
+    }
+
+    importedData.push({
+      id: row['id'],
+      name: row['名前'],
+      evasion: convertEvasion(row['回避率']),
+      body: row['体格'],
+      colorCategory: getColorCategory(row['色']),
+      color: row['色'],
+      head: row['頭'],
+      antennaCategory: getAntennaCategory(row['アンテナ']),
+      antenna: row['アンテナ'],
+      feature: row['特徴'],
+      capture: row['捕獲'] === 'True',
+      favorite: row['お気に入り'] === 'True',
+      createdAt: Date.now(),
+      qrFile,
+    })
+  }
+
+  const mergedData = denpaList.map((existing) => {
+    const imported = importedData.find(
+      (denpa) => denpa.id === existing.id
+    )
+
+    if (!imported) {
+      return existing
+    }
+
+    return {
+      ...existing,
+      ...imported,
+    }
+  })
+
+  const newData = importedData.filter(
+    (denpa) => !denpaList.some(
+      (existing) => existing.id === denpa.id
+    )
+  )
+
+  return [
+    ...mergedData,
+    ...newData,
+  ]
 }
 
 type SearchMatch = {
@@ -905,6 +1168,9 @@ function Home({
 }) {
   const [backupFile, setBackupFile] = useState<File | null>(null)
 
+  const [colabCsvFile, setColabCsvFile] = useState<File | null>(null)
+  const [colabZipFile, setColabZipFile] = useState<File | null>(null)
+
   return (
     <div className="app">
       <header className="header">
@@ -968,6 +1234,59 @@ function Home({
             }}
           />
 
+        </div>
+
+        <div className="home-import">
+          <h3>Colab版データを追加</h3>
+
+          <input
+            type="file"
+            accept=".csv"
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null
+              setColabCsvFile(file)
+            }}
+          />
+
+          <input
+            type="file"
+            accept=".zip"
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null
+              setColabZipFile(file)
+            }}
+          />
+
+          <button
+            onClick={async () => {
+              if (!colabCsvFile || !colabZipFile) {
+                alert('CSVファイルとQR画像ZIPファイルを選択してください。')
+                return
+              }
+
+              try {
+                const importedData = await importColabData(
+                  colabCsvFile,
+                  colabZipFile,
+                  denpaList
+                )
+
+                setDenpaList(importedData)
+
+                alert(
+                  `${importedData.length}件のデータを移行しました。`
+                )
+
+                setColabCsvFile(null)
+                setColabZipFile(null)
+              } catch (error) {
+                console.error(error)
+                alert('データの移行に失敗しました。')
+              }
+            }}
+          >
+            移行する
+          </button>
         </div>
 
         <div className="home-menu">
@@ -1539,7 +1858,7 @@ function Save({
                       disabled={!antennaCategory}
                     >
                       {antennaCategory &&
-                        ANTENNA_OPTIONS[antennaCategory].map((item) => (
+                        ANTENNA_OPTIONS[antennaCategory]?.map((item) => (
                           <option key={item} value={item}>
                             {item}
                           </option>
@@ -1645,39 +1964,46 @@ function Save({
                         )}
                       </td>
 
-                      {item.hp.map((value, index) => (
-                        <td
-                          key={index}
-                          className={
-                            hoveredCell?.row === rowIndex &&
-                              hoveredCell?.col === index
-                              ? 'body-table-cell-hover'
-                              : hoveredCell?.row === rowIndex ||
-                                hoveredCell?.col === index
-                                ? 'body-table-line-hover'
-                                : ''
-                          }
-                          onMouseEnter={() => {
-                            setHoveredCell({
-                              row: rowIndex,
-                              col: index,
-                            })
-                          }}
+                      {Array.isArray(item.hp) &&
+                        item.hp.map(
+                          (value, index) => (
 
-                          onMouseLeave={() => {
-                            setHoveredCell(null)
-                          }}
+                            <td
+                              key={index}
+                              className={
+                                hoveredCell?.row ===
+                                  rowIndex &&
+                                  hoveredCell?.col ===
+                                  index
+                                  ? 'body-table-cell-hover'
+                                  : hoveredCell?.row ===
+                                    rowIndex ||
+                                    hoveredCell?.col ===
+                                    index
+                                    ? 'body-table-line-hover'
+                                    : ''
+                              }
+                              onMouseEnter={() => {
+                                setHoveredCell({
+                                  row: rowIndex,
+                                  col: index,
+                                })
+                              }}
+                              onMouseLeave={() => {
+                                setHoveredCell(null)
+                              }}
+                              onClick={() => {
+                                handleBodyTableClick(
+                                  item.antenna,
+                                  BODY_TYPES[index]
+                                )
+                              }}
+                            >
+                              {value}
+                            </td>
 
-                          onClick={() => {
-                            handleBodyTableClick(
-                              item.antenna,
-                              BODY_TYPES[index]
-                            )
-                          }}
-                        >
-                          {value}
-                        </td>
-                      ))}
+                          )
+                        )}
                     </tr>
                   ))
                 ) : (
@@ -2038,9 +2364,7 @@ function Edit({
                       disabled={!colorCategory}
                     >
                       {colorCategory &&
-                        COLOR_OPTIONS[
-                          colorCategory
-                        ].map((item) => (
+                        COLOR_OPTIONS[colorCategory]?.map((item) => (
                           <option
                             key={item}
                             value={item}
@@ -4356,38 +4680,52 @@ function App() {
   // ========================================
 
   useEffect(() => {
-    const savedData =
-      localStorage.getItem('denpaList')
+    const loadDenpaList = async () => {
+      const savedData =
+        localStorage.getItem('denpaList')
 
-    if (!savedData) {
+      if (!savedData) {
+        setIsDenpaListLoaded(true)
+        return
+      }
+
+      try {
+        const parsedData =
+          JSON.parse(savedData) as SavedDenpaData[]
+
+        const restoredData: DenpaData[] =
+          await Promise.all(
+            parsedData.map(async (item) => {
+              let qrFile: File | null = null
+
+              if (item.qrFile) {
+                qrFile = dataUrlToFile(
+                  item.qrFile,
+                  `${item.name || 'denpa'}.png`
+                )
+              } else {
+                qrFile = await getQrFile(item.id)
+              }
+
+              return {
+                ...item,
+                qrFile,
+              }
+            })
+          )
+
+        setDenpaList(restoredData)
+      } catch (error) {
+        console.error(
+          'データの読み込みに失敗しました:',
+          error
+        )
+      }
+
       setIsDenpaListLoaded(true)
-      return
     }
 
-    try {
-      const parsedData =
-        JSON.parse(savedData) as SavedDenpaData[]
-
-      const restoredData: DenpaData[] =
-        parsedData.map((item) => ({
-          ...item,
-          qrFile: item.qrFile
-            ? dataUrlToFile(
-              item.qrFile,
-              `${item.name || 'denpa'}.png`
-            )
-            : null,
-        }))
-
-      setDenpaList(restoredData)
-    } catch (error) {
-      console.error(
-        'localStorageからのデータ読み込みに失敗しました:',
-        error
-      )
-    }
-
-    setIsDenpaListLoaded(true)
+    loadDenpaList()
   }, [])
 
   useEffect(() => {
@@ -4408,25 +4746,10 @@ function App() {
 
     const saveData = async () => {
       try {
-        const dataToSave: SavedDenpaData[] =
-          await Promise.all(
-            denpaList.map(async (item) => ({
-              ...item,
-              qrFile: item.qrFile
-                ? await fileToDataUrl(
-                  item.qrFile
-                )
-                : null,
-            }))
-          )
-
-        localStorage.setItem(
-          'denpaList',
-          JSON.stringify(dataToSave)
-        )
+        await saveDenpaList(denpaList)
       } catch (error) {
         console.error(
-          'localStorageへのデータ保存に失敗しました:',
+          'データの保存に失敗しました:',
           error
         )
       }
