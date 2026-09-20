@@ -1217,7 +1217,7 @@ function Save({
     useState<'select' | 'generate'>(
       location.state?.qrMode ?? 'select'
     )
-    
+
   const [generatedQr, setGeneratedQr] = useState<string | null>(null)
   const [qrLength, setQrLength] = useState(100)
   const [qrDecided, setQrDecided] = useState(false)
@@ -2665,6 +2665,24 @@ function Search({
   const [featureRequired, setFeatureRequired] = useState(true)
 
   const [optionalMin, setOptionalMin] = useState(0)
+
+  const [expandedQr, setExpandedQr] = useState<DenpaData | null>(null)
+
+  useEffect(() => {
+    if (!expandedQr) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setExpandedQr(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [expandedQr])
 
   useEffect(() => {
     if (location.state?.fromEdit !== true) {
@@ -4386,6 +4404,19 @@ function Search({
                                     }
                                   />
 
+                                  <button
+                                    type="button"
+                                    className="qr-expand-button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setExpandedQr(denpa)
+                                    }}
+                                    aria-label="QRコードを拡大"
+                                    title="QRコードを拡大"
+                                  >
+                                    ⛶
+                                  </button>
+
                                   {denpa.capture && (
                                     <div className="captured-label">
                                       捕獲済み
@@ -4533,6 +4564,46 @@ function Search({
           </div>
 
         </section>
+
+        {expandedQr && (
+          <div
+            className="qr-modal-overlay"
+            onClick={() => setExpandedQr(null)}
+          >
+            <div
+              className="qr-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="qr-modal-close"
+                onClick={() => setExpandedQr(null)}
+                aria-label="閉じる"
+                title="閉じる"
+              >
+                ×
+              </button>
+
+              <img
+                className="qr-modal-image"
+                src={
+                  expandedQr.qrFile
+                    ? URL.createObjectURL(expandedQr.qrFile)
+                    : '/denpa-qr-web/no-image.jpg'
+                }
+                alt={
+                  expandedQr.qrFile
+                    ? `${expandedQr.name}のQRコード`
+                    : 'QR画像なし'
+                }
+              />
+
+              <div className="qr-modal-name">
+                {expandedQr.name || '名前未設定'}
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
 
