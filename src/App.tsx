@@ -1006,6 +1006,22 @@ const BODY_TABLE_EXCEPTIONS: Record<string, string> = {
     '回避率+1',
 }
 
+function Header() {
+  return (
+    <header className="site-header">
+      <Link to="/" className="site-title">
+        電波人間 QRコード管理ツール
+      </Link>
+
+      <nav className="site-nav">
+        <Link to="/">ホーム</Link>
+        <Link to="/save">登録</Link>
+        <Link to="/search">検索</Link>
+      </nav>
+    </header>
+  )
+}
+
 function Home({
   denpaList,
   setDenpaList,
@@ -1025,77 +1041,127 @@ function Home({
 
   return (
     <div className="app">
-      <header className="header">
-        <h1>電波人間 QRコード管理ツール</h1>
-      </header>
+      <Header />
 
       <main className="home">
-        <div className='home-backup'>
-          <button className='backup-button'
-            onClick={() => {
-              const confirmed = window.confirm(
-                '現在のデータのバックアップファイルをダウンロードしますか？'
-              )
 
-              if (!confirmed) {
-                return
-              }
+        <div className="home-column home-data-column">
+          <div className="home-backup">
+            <h2 className="home-data-title">データ管理</h2>
 
-              createBackupFile(
-                denpaList,
-                qrHistory,
-                searchConditions
-              )
-            }}
-          >
-            バックアップ
-          </button>
+            <div className="home-data-section">
+              <p>バックアップファイルをダウンロードします。</p>
 
-          <button className='restore-button'
-            onClick={() => {
-              if (!backupFile) {
-                alert('バックアップファイルを選択してください。')
-                return
-              }
+              <button
+                type="button"
+                className="backup-button"
+                onClick={() => {
+                  const confirmed = window.confirm(
+                    '現在のデータのバックアップファイルをダウンロードしますか？'
+                  )
 
-              const confirmed = window.confirm(
-                'このバックアップファイルのデータを復元しますか？'
-              )
+                  if (!confirmed) {
+                    return
+                  }
 
-              if (!confirmed) {
-                return
-              }
+                  createBackupFile(
+                    denpaList,
+                    qrHistory,
+                    searchConditions
+                  )
+                }}
+              >
+                バックアップ
+              </button>
+            </div>
 
-              restoreBackupFile(
-                backupFile,
-                setDenpaList,
-                setQrHistory,
-                setSearchConditions
-              )
-            }}
-          >
-            復元
-          </button>
+            <div className="home-data-section">
+              <p>バックアップファイルから復元します。</p>
 
-          <input
-            type="file"
-            accept=".json"
-            onChange={(e) => {
-              const file = e.target.files?.[0] ?? null
-              setBackupFile(file)
-            }}
-          />
+              <div className="home-restore-controls">
+                <button
+                  type="button"
+                  className="restore-button"
+                  disabled={!backupFile}
+                  onClick={() => {
+                    if (!backupFile) {
+                      alert('バックアップファイルを選択してください。')
+                      return
+                    }
+
+                    const confirmed = window.confirm(
+                      'このバックアップファイルのデータを復元しますか？'
+                    )
+
+                    if (!confirmed) {
+                      return
+                    }
+
+                    restoreBackupFile(
+                      backupFile,
+                      setDenpaList,
+                      setQrHistory,
+                      setSearchConditions
+                    )
+                  }}
+                >
+                  復元
+                </button>
+
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null
+                    setBackupFile(file)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div className="home-column home-main-column">
+
+          <div className="home-tool-description">
+            <h2>このツールについて</h2>
+
+            <p>
+              電波人間のステータスとQRコードを登録し、
+              条件を指定して検索できる管理ツールです。
+            </p>
+          </div>
+
+          <div className="home-menu">
+
+            <div className="home-menu-item">
+              <Link to="/save" className="home-main-button">
+                ＋ 電波人間を登録
+              </Link>
+
+              <p className="home-feature-description">
+                電波人間の名前やステータス、QRコードを登録できます。
+              </p>
+            </div>
+
+            <div className="home-menu-item">
+              <Link to="/search" className="home-main-button">
+                🔍 電波人間を検索
+              </Link>
+
+              <p className="home-feature-description">
+                登録した電波人間を条件から検索し、一覧で確認できます。
+              </p>
+            </div>
+
+          </div>
 
         </div>
 
-        <div className="home-menu">
-          <Link to="/save" className="menu-button">
-            電波人間のステータスとQRコードを登録
-          </Link>
 
-          <Link to="/search" className="menu-button">
-            登録した電波人間を検索
-          </Link>
+        <div className="home-column home-future-column">
+          {/* 将来ここに機能を追加 */}
         </div>
 
       </main>
@@ -1123,8 +1189,12 @@ function QrHistory({
   )
   return (
     <div className="qr-history-page">
+
+      <Header />
+
       <div className="qr-history-header">
         <button
+          type="button"
           className="search-back-button"
           onClick={() => {
             navigate('/save', {
@@ -1139,54 +1209,72 @@ function QrHistory({
 
         <h2>QRコード生成履歴（直近300個）</h2>
 
-        <div className="qr-history-pagination">
-          <button
-            onClick={() => setPage((currentPage) => currentPage - 1)}
-            disabled={page === 1}
-          >
-            ←
-          </button>
-
-          <span>
-            {page} / {totalPages || 1}
-          </span>
-
-          <button
-            onClick={() => setPage((currentPage) => currentPage + 1)}
-            disabled={page === totalPages || totalPages === 0}
-          >
-            →
-          </button>
-        </div>
+        <span className="qr-history-page-number">
+          {page} / {totalPages || 1}
+        </span>
       </div>
 
-      <div className="qr-history-grid">
-        {currentHistory.map((item) => (
-          <div
-            key={item.id}
-            className="qr-history-item"
-          >
-            <p>
-              {new Date(item.createdAt).toLocaleString('ja-JP')}
-            </p>
+      <div className="qr-history-card-area">
 
-            <button
-              onClick={() => {
-                const link = document.createElement('a')
-                link.href = item.qrData
-                link.download = `qr-${item.id}.png`
-                link.click()
-              }}
+        <button
+          type="button"
+          className="qr-history-pagination-button qr-history-pagination-prev"
+          onClick={() => setPage((currentPage) => currentPage - 1)}
+          disabled={page === 1}
+          aria-label="前のページ"
+        >
+          ＜
+        </button>
+
+        <div className="qr-history-grid">
+          {currentHistory.map((item) => (
+            <div
+              key={item.id}
+              className="qr-history-item"
             >
-              画像を保存
-            </button>
+              <div className="qr-history-item-info">
+                <p>
+                  {new Date(item.createdAt).toLocaleString('ja-JP')}
+                </p>
 
-            <img
-              src={item.qrData}
-              alt="生成したQRコード"
-            />
-          </div>
-        ))}
+                <button
+                  type="button"
+                  className="qr-history-download-button"
+                  onClick={() => {
+                    const link = document.createElement('a')
+                    link.href = item.qrData
+                    link.download = `qr-${item.id}.png`
+                    link.click()
+                  }}
+                  aria-label="画像を保存"
+                  title="画像を保存"
+                >
+                  <span className="download-icon">
+                    <span className="download-arrow"></span>
+                    <span className="download-line"></span>
+                  </span>
+                </button>
+
+              </div>
+
+              <img
+                src={item.qrData}
+                alt="生成したQRコード"
+              />
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="qr-history-pagination-button qr-history-pagination-next"
+          onClick={() => setPage((currentPage) => currentPage + 1)}
+          disabled={page === totalPages || totalPages === 0}
+          aria-label="次のページ"
+        >
+          ＞
+        </button>
+
       </div>
     </div>
   )
@@ -1378,17 +1466,10 @@ function Save({
 
   return (
     <div className="app">
-      <main className="save-page">
-        <div className="save-title">
-          <button
-            className="search-back-button"
-            onClick={() => navigate('/')}
-          >
-            ⇦
-          </button>
 
-          <h2>電波人間のデータを登録</h2>
-        </div>
+      <Header />
+
+      <main className="save-page">
 
         <div className="save-layout">
           <div className="save-left">
@@ -2066,28 +2147,9 @@ function Edit({
 
   return (
     <div className="app">
+      <Header />
+
       <main className="save-page">
-
-        <div className="save-title">
-          <button
-            type="button"
-            className="search-back-button"
-            onClick={() => {
-              navigate('/search', {
-                state: searchPageState
-                  ? {
-                    fromEdit: true,
-                    searchPageState,
-                  }
-                  : undefined,
-              })
-            }}
-          >
-            ⇦
-          </button>
-
-          <h2>電波人間のデータを編集</h2>
-        </div>
 
         <div className="save-layout">
 
@@ -3037,36 +3099,15 @@ function Search({
 
   return (
     <div className="app">
+      <div className="search-page">
+        <Header />
 
-      <main className="list-page">
+        <main className="list-page">
 
-        {/* 左側：検索条件 */}
-        <aside className="list-sidebar search-sidebar">
+          {/* 左側：検索条件 */}
+          <aside className="list-sidebar search-sidebar">
 
-          <div className="search-title-row">
-            <Link to="/" className="search-back-button">
-              ⇦
-            </Link>
-            <h2>電波人間を検索</h2>
-          </div>
-
-          <div className="search-form">
-
-            <div className="form-row">
-              <label htmlFor="search-uuid">
-                UUID
-              </label>
-
-              <input
-                id="search-uuid"
-                type="text"
-                value={uuid}
-                onChange={(e) => {
-                  setUuid(e.target.value)
-                  setCurrentPage(1)
-                }}
-                placeholder="特定の１体を検索できます"
-              />
+            <div className="search-form">
 
               <button
                 type="button"
@@ -3075,523 +3116,506 @@ function Search({
                 検索条件をクリア
               </button>
 
-            </div>
+              <div className="form-row">
+                <label htmlFor="search-uuid">
+                  UUID
+                </label>
 
-            <div className="form-row">
-              <label htmlFor="search-name">
-                名前
-              </label>
-
-              <input
-                id="search-name"
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  const value = e.target.value
-
-                  setName(value)
-                  setCurrentPage(1)
-
-                  if (value === '') {
-                    setNameRequired(true)
-                  }
-                }}
-                placeholder="名前の一部でも検索できます"
-              />
-
-              {name && (
-                <button
-                  type="button"
-                  className={
-                    nameRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setNameRequired(!nameRequired)
+                <input
+                  id="search-uuid"
+                  type="text"
+                  value={uuid}
+                  onChange={(e) => {
+                    setUuid(e.target.value)
                     setCurrentPage(1)
                   }}
-                >
-                  {nameRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
+                  placeholder="特定の１体を検索できます"
+                />
 
-            <div className="form-row">
-              <label htmlFor="search-evasion">
-                回避率
-              </label>
+              </div>
 
-              <select
-                id="search-evasion"
-                value={evasion}
-                onChange={(e) => {
-                  setEvasion(e.target.value)
-                  setCurrentPage(1)
-                }}
-              >
-                <option value="">
-                  指定なし
-                </option>
+              <div className="form-row">
+                <label htmlFor="search-name">
+                  名前
+                </label>
 
-                {EVASION_OPTIONS.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
+                <input
+                  id="search-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    const value = e.target.value
+
+                    setName(value)
+                    setCurrentPage(1)
+
+                    if (value === '') {
+                      setNameRequired(true)
+                    }
+                  }}
+                  placeholder="名前の一部でも検索できます"
+                />
+
+                {name && (
+                  <button
+                    type="button"
+                    className={
+                      nameRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setNameRequired(!nameRequired)
+                      setCurrentPage(1)
+                    }}
                   >
-                    {option}
-                  </option>
-                ))}
-              </select>
+                    {nameRequired ? "必須" : "任意"}
+                  </button>
+                )}
+              </div>
 
-              {evasion && (
-                <button
-                  type="button"
-                  className={
-                    evasionRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setEvasionRequired(!evasionRequired)
-                    setCurrentPage(1)
-                  }}
-                >
-                  {evasionRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
-
-            <div className="form-row">
-              <label htmlFor="search-body">
-                体格
-              </label>
-
-              <select
-                id="search-body"
-                value={body}
-                onChange={(e) => {
-                  setBody(e.target.value)
-                  setCurrentPage(1)
-                }}
-              >
-                <option value="">
-                  指定なし
-                </option>
-
-                {BODY_OPTIONS.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
-              </select>
-
-              {body && (
-                <button
-                  type="button"
-                  className={
-                    bodyRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setBodyRequired(!bodyRequired)
-                    setCurrentPage(1)
-                  }}
-                >
-                  {bodyRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
-
-            <div className="form-row">
-              <label>
-                色
-              </label>
-
-              <div className="select-group">
+              <div className="form-row">
+                <label htmlFor="search-evasion">
+                  回避率
+                </label>
 
                 <select
-                  value={colorCategory}
+                  id="search-evasion"
+                  value={evasion}
                   onChange={(e) => {
-                    const newCategory =
-                      e.target.value
-
-                    setColorCategory(newCategory)
-                    setColor('')
+                    setEvasion(e.target.value)
                     setCurrentPage(1)
-
-                    if (newCategory === '') {
-                      setColorRequired(true)
-                    }
                   }}
                 >
                   <option value="">
                     指定なし
                   </option>
 
-                  {Object.keys(COLOR_OPTIONS).map(
-                    (category) => (
+                  {EVASION_OPTIONS.map((option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                {evasion && (
+                  <button
+                    type="button"
+                    className={
+                      evasionRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setEvasionRequired(!evasionRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {evasionRequired ? "必須" : "任意"}
+                  </button>
+                )}
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="search-body">
+                  体格
+                </label>
+
+                <select
+                  id="search-body"
+                  value={body}
+                  onChange={(e) => {
+                    setBody(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <option value="">
+                    指定なし
+                  </option>
+
+                  {BODY_OPTIONS.map((option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                {body && (
+                  <button
+                    type="button"
+                    className={
+                      bodyRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setBodyRequired(!bodyRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {bodyRequired ? "必須" : "任意"}
+                  </button>
+                )}
+              </div>
+
+              <div className="form-row">
+                <label>
+                  色
+                </label>
+
+                <div className="select-group">
+
+                  <select
+                    value={colorCategory}
+                    onChange={(e) => {
+                      const newCategory =
+                        e.target.value
+
+                      setColorCategory(newCategory)
+                      setColor('')
+                      setCurrentPage(1)
+
+                      if (newCategory === '') {
+                        setColorRequired(true)
+                      }
+                    }}
+                  >
+                    <option value="">
+                      指定なし
+                    </option>
+
+                    {Object.keys(COLOR_OPTIONS).map(
+                      (category) => (
+                        <option
+                          key={category}
+                          value={category}
+                        >
+                          {category}
+                        </option>
+                      )
+                    )}
+                  </select>
+
+                  <span>＞</span>
+
+                  <select
+                    value={color}
+                    onChange={(e) => {
+                      setColor(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    disabled={!colorCategory}
+                  >
+                    <option value="">
+                      指定なし
+                    </option>
+
+                    {colorCategory &&
+                      COLOR_OPTIONS[
+                        colorCategory
+                      ].map((item) => (
+                        <option
+                          key={item}
+                          value={item}
+                        >
+                          {item}
+                        </option>
+                      ))}
+                  </select>
+
+                </div>
+
+                {colorCategory !== '' && (
+                  <button
+                    type="button"
+                    className={
+                      colorRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setColorRequired(!colorRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {colorRequired ? "必須" : "任意"}
+                  </button>
+                )}
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="search-head">
+                  頭
+                </label>
+
+                <select
+                  id="search-head"
+                  value={head}
+                  onChange={(e) => {
+                    setHead(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <option value="">
+                    指定なし
+                  </option>
+
+                  {HEAD_OPTIONS.map((option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                {head && (
+                  <button
+                    type="button"
+                    className={
+                      headRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setHeadRequired(!headRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {headRequired ? "必須" : "任意"}
+                  </button>
+                )}
+              </div>
+
+              <div className="form-row">
+                <label>
+                  アンテナ
+                </label>
+
+                <div className="select-group">
+
+                  <select
+                    value={antennaCategory}
+                    onChange={(e) => {
+                      const newCategory =
+                        e.target.value
+
+                      setAntennaCategory(
+                        newCategory
+                      )
+
+                      setAntenna('')
+                      setCurrentPage(1)
+
+                      if (newCategory === '') {
+                        setAntennaRequired(true)
+                      }
+                    }}
+                  >
+                    <option value="">
+                      指定なし
+                    </option>
+
+                    {Object.keys(
+                      ANTENNA_OPTIONS
+                    ).map((category) => (
                       <option
                         key={category}
                         value={category}
                       >
                         {category}
                       </option>
-                    )
-                  )}
-                </select>
-
-                <span>＞</span>
-
-                <select
-                  value={color}
-                  onChange={(e) => {
-                    setColor(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                  disabled={!colorCategory}
-                >
-                  <option value="">
-                    指定なし
-                  </option>
-
-                  {colorCategory &&
-                    COLOR_OPTIONS[
-                      colorCategory
-                    ].map((item) => (
-                      <option
-                        key={item}
-                        value={item}
-                      >
-                        {item}
-                      </option>
                     ))}
-                </select>
+                  </select>
 
+                  <span>＞</span>
+
+                  <select
+                    value={antenna}
+                    onChange={(e) => {
+                      setAntenna(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    disabled={!antennaCategory}
+                  >
+                    <option value="">
+                      指定なし
+                    </option>
+
+                    {antennaCategory &&
+                      ANTENNA_OPTIONS[
+                        antennaCategory
+                      ].map((item) => (
+                        <option
+                          key={item}
+                          value={item}
+                        >
+                          {item}
+                        </option>
+                      ))}
+                  </select>
+
+                </div>
+
+                {antennaCategory !== '' && (
+                  <button
+                    type="button"
+                    className={
+                      antennaRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setAntennaRequired(!antennaRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {antennaRequired ? "必須" : "任意"}
+                  </button>
+                )}
               </div>
 
-              {colorCategory !== '' && (
-                <button
-                  type="button"
-                  className={
-                    colorRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setColorRequired(!colorRequired)
-                    setCurrentPage(1)
-                  }}
-                >
-                  {colorRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
-
-            <div className="form-row">
-              <label htmlFor="search-head">
-                頭
-              </label>
-
-              <select
-                id="search-head"
-                value={head}
-                onChange={(e) => {
-                  setHead(e.target.value)
-                  setCurrentPage(1)
-                }}
-              >
-                <option value="">
-                  指定なし
-                </option>
-
-                {HEAD_OPTIONS.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
-              </select>
-
-              {head && (
-                <button
-                  type="button"
-                  className={
-                    headRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setHeadRequired(!headRequired)
-                    setCurrentPage(1)
-                  }}
-                >
-                  {headRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
-
-            <div className="form-row">
-              <label>
-                アンテナ
-              </label>
-
-              <div className="select-group">
+              <div className="form-row">
+                <label htmlFor="search-feature">
+                  特徴
+                </label>
 
                 <select
-                  value={antennaCategory}
+                  id="search-feature"
+                  value={feature}
                   onChange={(e) => {
-                    const newCategory =
-                      e.target.value
-
-                    setAntennaCategory(
-                      newCategory
-                    )
-
-                    setAntenna('')
+                    setFeature(e.target.value)
                     setCurrentPage(1)
-
-                    if (newCategory === '') {
-                      setAntennaRequired(true)
-                    }
                   }}
                 >
                   <option value="">
                     指定なし
                   </option>
 
-                  {Object.keys(
-                    ANTENNA_OPTIONS
-                  ).map((category) => (
+                  {FEATURE_OPTIONS.map((option) => (
                     <option
-                      key={category}
-                      value={category}
+                      key={option}
+                      value={option}
                     >
-                      {category}
+                      {option}
                     </option>
                   ))}
                 </select>
 
-                <span>＞</span>
-
-                <select
-                  value={antenna}
-                  onChange={(e) => {
-                    setAntenna(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                  disabled={!antennaCategory}
-                >
-                  <option value="">
-                    指定なし
-                  </option>
-
-                  {antennaCategory &&
-                    ANTENNA_OPTIONS[
-                      antennaCategory
-                    ].map((item) => (
-                      <option
-                        key={item}
-                        value={item}
-                      >
-                        {item}
-                      </option>
-                    ))}
-                </select>
-
+                {feature && (
+                  <button
+                    type="button"
+                    className={
+                      featureRequired
+                        ? "condition-button required"
+                        : "condition-button optional"
+                    }
+                    onClick={() => {
+                      setFeatureRequired(!featureRequired)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    {featureRequired ? "必須" : "任意"}
+                  </button>
+                )}
               </div>
 
-              {antennaCategory !== '' && (
-                <button
-                  type="button"
-                  className={
-                    antennaRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setAntennaRequired(!antennaRequired)
+              <div className="search-field">
+                <label>
+                  任意項目：
+                </label>
+
+                <select
+                  value={optionalMin}
+                  onChange={(e) => {
+                    setOptionalMin(Number(e.target.value))
                     setCurrentPage(1)
                   }}
                 >
-                  {antennaRequired ? "必須" : "任意"}
-                </button>
-              )}
-            </div>
+                  {Array.from(
+                    { length: optionalConditionCount + 1 },
+                    (_, i) => (
+                      <option key={i} value={i}>
+                        {i}
+                      </option>
+                    )
+                  )}
+                </select>
 
-            <div className="form-row">
-              <label htmlFor="search-feature">
-                特徴
-              </label>
+                <span>個以上一致</span>
+              </div>
 
-              <select
-                id="search-feature"
-                value={feature}
-                onChange={(e) => {
-                  setFeature(e.target.value)
-                  setCurrentPage(1)
-                }}
-              >
-                <option value="">
-                  指定なし
-                </option>
+              <div className="search-condition-buttons">
 
-                {FEATURE_OPTIONS.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
-              </select>
-
-              {feature && (
                 <button
                   type="button"
-                  className={
-                    featureRequired
-                      ? "condition-button required"
-                      : "condition-button optional"
-                  }
-                  onClick={() => {
-                    setFeatureRequired(!featureRequired)
-                    setCurrentPage(1)
-                  }}
+                  onClick={() => setConditionMode('register')}
                 >
-                  {featureRequired ? "必須" : "任意"}
+                  現在の検索条件を登録する
                 </button>
-              )}
-            </div>
 
-            <div className="search-field">
-              <label>
-                任意項目：
-              </label>
-
-              <select
-                value={optionalMin}
-                onChange={(e) => {
-                  setOptionalMin(Number(e.target.value))
-                  setCurrentPage(1)
-                }}
-              >
-                {Array.from(
-                  { length: optionalConditionCount + 1 },
-                  (_, i) => (
-                    <option key={i} value={i}>
-                      {i}
-                    </option>
-                  )
-                )}
-              </select>
-
-              <span>個以上一致</span>
-            </div>
-
-            <div className="search-condition-buttons">
-
-              <button
-                type="button"
-                onClick={() => setConditionMode('register')}
-              >
-                現在の検索条件を登録する
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedConditionId(null)
-                  setEditingConditionName('')
-                  setConditionMode('load')
-                }}
-              >
-                登録した検索条件を使う
-              </button>
-            </div>
-
-          </div>
-
-        </aside>
-
-        {/* 右側 */}
-        <section className="list-content">
-
-          {/* 右上 */}
-          <div className="list-pagination">
-            {conditionMode === 'register' ? null : conditionMode === 'load' ? (
-              <div className="condition-mode-title">
                 <button
                   type="button"
-                  className="condition-back-button"
                   onClick={() => {
                     setSelectedConditionId(null)
                     setEditingConditionName('')
-                    setConditionMode('none')
+                    setConditionMode('load')
                   }}
-                  aria-label="検索画面に戻る"
-                  title="戻る"
                 >
-                  ⇦
+                  登録した検索条件を使う
                 </button>
-
-                <h2>登録した検索条件を呼び出します</h2>
               </div>
-            ) : (
-              <>
-                <div className="sort-control">
-                  <label>
-                    並び順：
-                    <select
-                      value={sortMode}
-                      onChange={(e) => {
-                        setSortMode(e.target.value as 'new' | 'old' | 'name')
-                        setCurrentPage(1)
-                      }}
-                    >
-                      <option value="new">新しく登録した順</option>
-                      <option value="old">古く登録した順</option>
-                      <option value="name">名前順</option>
-                    </select>
-                  </label>
+
+            </div>
+
+          </aside>
+
+          {/* 右側 */}
+          <section className="list-content">
+
+            {/* 右上 */}
+            <div className="list-pagination">
+              {conditionMode === 'register' ? null : conditionMode === 'load' ? (
+                <div className="condition-mode-title">
+                  <button
+                    type="button"
+                    className="condition-back-button"
+                    onClick={() => {
+                      setSelectedConditionId(null)
+                      setEditingConditionName('')
+                      setConditionMode('none')
+                    }}
+                    aria-label="検索画面に戻る"
+                    title="戻る"
+                  >
+                    ⇦
+                  </button>
+
+                  <h2>登録した検索条件を呼び出します</h2>
                 </div>
+              ) : (
+                <div className="search-top-controls">
 
-                <button
-                  className="pagination-button"
-                  onClick={() =>
-                    setCurrentPage((page) => page - 1)
-                  }
-                  disabled={currentPage === 1}
-                >
-                  ⇦
-                </button>
+                  <div className="search-summary-item search-result-count">
+                    <span>
+                      検索結果：{searchResults.length}件
+                    </span>
 
-                <span>
-                  {currentPage} / {totalPages || 1}
-                </span>
+                    <span>
+                      {currentPage} / {totalPages || 1}ページ
+                    </span>
+                  </div>
 
-                <button
-                  className="pagination-button"
-                  onClick={() =>
-                    setCurrentPage((page) => page + 1)
-                  }
-                  disabled={
-                    currentPage === totalPages ||
-                    totalPages === 0
-                  }
-                >
-                  ⇨
-                </button>
+                  <div className="search-summary-item">
+                    <span>表示件数：</span>
 
-                <div className="items-per-page-control">
-                  <label>
-                    表示件数：
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
@@ -3604,510 +3628,22 @@ function Search({
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                  </label>
-                </div>
-              </>
-            )}
-          </div>
+                  </div>
 
-          {/* 右下：検索結果 */}
-          <div className="list-cards">
+                  <div className="search-summary-item">
+                    <span>並び順：</span>
 
-            {conditionMode === 'register' ? (
-              <div className="condition-register">
-                <h3>現在の検索条件をお気に入り登録できます</h3>
-
-                <label>
-                  登録名：
-                  <input
-                    type="text"
-                    value={conditionName}
-                    onChange={(e) => setConditionName(e.target.value)}
-                  />
-                </label>
-
-                <div className="condition-register-buttons">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (conditionName.trim() === '') {
-                        alert('登録名を入力してください')
-                        return
-                      }
-
-                      const newCondition: SearchCondition = {
-                        id: crypto.randomUUID(),
-                        name: conditionName.trim(),
-                        uuid,
-                        searchName: name,
-                        evasion,
-                        body,
-                        colorCategory,
-                        color,
-                        head,
-                        antennaCategory,
-                        antenna,
-                        feature,
-                        nameRequired,
-                        evasionRequired,
-                        bodyRequired,
-                        colorRequired,
-                        headRequired,
-                        antennaRequired,
-                        featureRequired,
-                        optionalMin,
-                        createdAt: Date.now(),
-                      }
-
-                      console.log('newCondition作成直後:', newCondition)
-
-                      setSearchConditions((currentConditions) => {
-                        const updatedConditions = [
-                          ...currentConditions,
-                          newCondition,
-                        ]
-
-                        console.log('登録するnewCondition:', newCondition)
-                        console.log('登録するoptionalMin:', newCondition.optionalMin)
-
-                        localStorage.setItem(
-                          'searchConditions',
-                          JSON.stringify(updatedConditions)
-                        )
-
-                        console.log(
-                          'localStorage保存後:',
-                          JSON.parse(localStorage.getItem('searchConditions') || '[]')
-                        )
-
-                        return updatedConditions
-                      })
-
-                      setConditionName('')
-                      setConditionMode('none')
-
-                      alert('検索条件をお気に入り登録しました')
-                    }}
-                  >
-                    登録する
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setConditionName('')
-                      setConditionMode('none')
-                    }}
-                  >
-                    キャンセル
-                  </button>
-                </div>
-              </div>
-            ) : conditionMode === 'load' ? (
-              <div className="condition-load">
-                <div className="condition-load-sort">
-                  <label>
-                    並び順：
                     <select
-                      value={conditionSort}
-                      onChange={(event) =>
-                        setConditionSort(
-                          event.target.value as 'new' | 'old' | 'name'
-                        )
-                      }
+                      value={sortMode}
+                      onChange={(e) => {
+                        setSortMode(e.target.value as 'new' | 'old' | 'name')
+                        setCurrentPage(1)
+                      }}
                     >
-                      <option value="new">新しい順</option>
-                      <option value="old">古い順</option>
-                      <option value="name">登録名順</option>
+                      <option value="new">新しく登録した順</option>
+                      <option value="old">古く登録した順</option>
+                      <option value="name">名前順</option>
                     </select>
-                  </label>
-                </div>
-
-                <div className="condition-load-content">
-                  <div className="condition-load-list">
-                    {searchConditions.length === 0 ? (
-                      <p>登録した検索条件はありません。</p>
-                    ) : (
-                      [...searchConditions]
-                        .sort((a, b) => {
-                          if (conditionSort === 'new') {
-                            return b.createdAt - a.createdAt
-                          }
-
-                          if (conditionSort === 'old') {
-                            return a.createdAt - b.createdAt
-                          }
-
-                          return a.name.localeCompare(b.name, 'ja')
-                        })
-                        .map((condition) => (
-                          <div
-                            key={condition.id}
-                            className="condition-load-item"
-                          >
-                            <button
-                              type="button"
-                              className="condition-load-item-name"
-                              onClick={() => {
-                                setSelectedConditionId(condition.id)
-                                setEditingConditionName(condition.name)
-                              }}
-                            >
-                              {condition.name}
-                            </button>
-
-                            <button
-                              type="button"
-                              className="condition-load-delete-button"
-                              onClick={() => {
-                                const shouldDelete = window.confirm(
-                                  `「${condition.name}」を削除しますか？`
-                                )
-
-                                if (!shouldDelete) {
-                                  return
-                                }
-
-                                setSearchConditions((currentConditions) => {
-                                  const updatedConditions = currentConditions.filter(
-                                    (item) => item.id !== condition.id
-                                  )
-
-                                  localStorage.setItem(
-                                    'searchConditions',
-                                    JSON.stringify(updatedConditions)
-                                  )
-
-                                  return updatedConditions
-                                })
-
-                                if (selectedConditionId === condition.id) {
-                                  setSelectedConditionId(null)
-                                  setEditingConditionName('')
-                                }
-
-                              }}
-                              aria-label={`${condition.name}を削除`}
-                              title="検索条件を削除"
-                            >
-                              <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  d="M5 7H19"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-
-                                <path
-                                  d="M10 7V5H14V7"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-
-                                <path
-                                  d="M8 7L9 20H15L16 7"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-
-                                <path
-                                  d="M10 11V16"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-
-                                <path
-                                  d="M14 11V16"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        ))
-                    )}
-                  </div>
-
-                  <div className="condition-load-detail">
-                    {selectedConditionId === null ? (
-                      <p>検索条件を選択してください。</p>
-                    ) : (
-                      (() => {
-                        const selectedCondition = searchConditions.find(
-                          (condition) => condition.id === selectedConditionId
-                        )
-
-                        if (!selectedCondition) {
-                          return <p>検索条件を選択してください。</p>
-                        }
-
-                        return (
-                          <>
-                            <div className="condition-load-name">
-                              <input
-                                type="text"
-                                value={editingConditionName}
-                                onChange={(event) => setEditingConditionName(event.target.value)}
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (editingConditionName.trim() === '') {
-                                    alert('登録名を入力してください')
-                                    return
-                                  }
-
-                                  setSearchConditions((currentConditions) => {
-                                    const updatedConditions = currentConditions.map((condition) =>
-                                      condition.id === selectedCondition.id
-                                        ? {
-                                          ...condition,
-                                          name: editingConditionName.trim(),
-                                        }
-                                        : condition
-                                    )
-
-                                    localStorage.setItem(
-                                      'searchConditions',
-                                      JSON.stringify(updatedConditions)
-                                    )
-
-                                    return updatedConditions
-                                  })
-
-                                  alert('登録名を変更しました')
-                                }}
-                              >
-                                登録名を変更
-                              </button>
-
-                            </div>
-
-                            <div className="condition-preview">
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">UUID</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span className="condition-preview-value">
-                                  {selectedCondition.uuid || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">名前</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span
-                                  className={
-                                    selectedCondition.searchName
-                                      ? selectedCondition.nameRequired
-                                        ? 'search-match search-match-required'
-                                        : 'search-match search-match-optional'
-                                      : 'condition-preview-value'
-                                  }
-                                >
-                                  {selectedCondition.searchName || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">回避率</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span
-                                  className={
-                                    selectedCondition.evasion
-                                      ? selectedCondition.evasionRequired
-                                        ? 'search-match search-match-required'
-                                        : 'search-match search-match-optional'
-                                      : 'condition-preview-value'
-                                  }
-                                >
-                                  {selectedCondition.evasion || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">体格</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span
-                                  className={
-                                    selectedCondition.body
-                                      ? selectedCondition.bodyRequired
-                                        ? 'search-match search-match-required'
-                                        : 'search-match search-match-optional'
-                                      : 'condition-preview-value'
-                                  }
-                                >
-                                  {selectedCondition.body || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">色</span>
-                                <span className="condition-preview-colon">：</span>
-
-                                {(selectedCondition.colorCategory || selectedCondition.color) ? (
-                                  <>
-                                    <span
-                                      className={
-                                        selectedCondition.colorRequired
-                                          ? 'search-match search-match-required'
-                                          : 'search-match search-match-optional'
-                                      }
-                                    >
-                                      {selectedCondition.colorCategory || '指定なし'}
-                                    </span>
-
-                                    <span>　＞　</span>
-
-                                    <span
-                                      className={
-                                        selectedCondition.colorRequired
-                                          ? 'search-match search-match-required'
-                                          : 'search-match search-match-optional'
-                                      }
-                                    >
-                                      {selectedCondition.color || '指定なし'}
-                                    </span>
-                                  </>
-                                ) : (
-                                  <span className="condition-preview-value">
-                                    指定なし
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">頭</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span
-                                  className={
-                                    selectedCondition.head
-                                      ? selectedCondition.headRequired
-                                        ? 'search-match search-match-required'
-                                        : 'search-match search-match-optional'
-                                      : 'condition-preview-value'
-                                  }
-                                >
-                                  {selectedCondition.head || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">アンテナ</span>
-                                <span className="condition-preview-colon">：</span>
-
-                                {(selectedCondition.antennaCategory || selectedCondition.antenna) ? (
-                                  <>
-                                    <span
-                                      className={
-                                        selectedCondition.antennaRequired
-                                          ? 'search-match search-match-required'
-                                          : 'search-match search-match-optional'
-                                      }
-                                    >
-                                      {selectedCondition.antennaCategory || '指定なし'}
-                                    </span>
-
-                                    <span>　＞　</span>
-
-                                    <span
-                                      className={
-                                        selectedCondition.antennaRequired
-                                          ? 'search-match search-match-required'
-                                          : 'search-match search-match-optional'
-                                      }
-                                    >
-                                      {selectedCondition.antenna || '指定なし'}
-                                    </span>
-                                  </>
-                                ) : (
-                                  <span className="condition-preview-value">
-                                    指定なし
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="condition-preview-row">
-                                <span className="condition-preview-label">特徴</span>
-                                <span className="condition-preview-colon">：</span>
-                                <span
-                                  className={
-                                    selectedCondition.feature
-                                      ? selectedCondition.featureRequired
-                                        ? 'search-match search-match-required'
-                                        : 'search-match search-match-optional'
-                                      : 'condition-preview-value'
-                                  }
-                                >
-                                  {selectedCondition.feature || '指定なし'}
-                                </span>
-                              </div>
-
-                              <div className="condition-preview-optional-min">
-                                任意項目：{selectedCondition.optionalMin}個以上一致
-                              </div>
-                            </div>
-
-                            <button className='condition-apply-button'
-                              type="button"
-                              onClick={() => {
-                                setUuid(selectedCondition.uuid)
-                                setName(selectedCondition.searchName)
-                                setEvasion(selectedCondition.evasion)
-                                setBody(selectedCondition.body)
-                                setColorCategory(selectedCondition.colorCategory)
-                                setColor(selectedCondition.color)
-                                setHead(selectedCondition.head)
-                                setAntennaCategory(selectedCondition.antennaCategory)
-                                setAntenna(selectedCondition.antenna)
-                                setFeature(selectedCondition.feature)
-
-                                setNameRequired(selectedCondition.nameRequired)
-                                setEvasionRequired(selectedCondition.evasionRequired)
-                                setBodyRequired(selectedCondition.bodyRequired)
-                                setColorRequired(selectedCondition.colorRequired)
-                                setHeadRequired(selectedCondition.headRequired)
-                                setAntennaRequired(selectedCondition.antennaRequired)
-                                setFeatureRequired(selectedCondition.featureRequired)
-
-                                setOptionalMin(selectedCondition.optionalMin)
-
-                                setConditionMode('none')
-                                setSelectedConditionId(null)
-                              }}
-                            >
-                              この検索条件を適用する
-                            </button>
-
-                          </>
-                        )
-                      })()
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            ) : (
-              <>
-                <div className="search-summary">
-
-                  <div className="search-summary-item search-result-count">
-                    <span>
-                      検索結果：{searchResults.length}件
-                    </span>
                   </div>
 
                   <div className="search-summary-item">
@@ -4120,21 +3656,11 @@ function Search({
                         setCurrentPage(1)
                       }}
                     >
-                      <option value="">
-                        指定なし
-                      </option>
-
-                      <option value="true">
-                        捕獲済み
-                      </option>
-
-                      <option value="false">
-                        未捕獲
-                      </option>
+                      <option value="">指定なし</option>
+                      <option value="true">捕獲済み</option>
+                      <option value="false">未捕獲</option>
                     </select>
-
                   </div>
-
 
                   <div className="search-summary-item">
                     <span>お気に入り：</span>
@@ -4146,357 +3672,209 @@ function Search({
                         setCurrentPage(1)
                       }}
                     >
-                      <option value="">
-                        指定なし
-                      </option>
-
-                      <option value="true">
-                        お気に入り
-                      </option>
-
-                      <option value="false">
-                        お気に入りではない
-                      </option>
+                      <option value="">指定なし</option>
+                      <option value="true">お気に入り</option>
+                      <option value="false">お気に入りではない</option>
                     </select>
-
                   </div>
 
                 </div>
+              )}
+            </div>
 
-                {searchResults.length === 0 ? (
+            {/* 右下：検索結果 */}
+            <div className="search-card-area">
 
-                  <p>条件に一致する電波人間はいません。</p>
+              <button
+                type="button"
+                className="card-pagination-button card-pagination-prev"
+                onClick={() =>
+                  setCurrentPage((page) => page - 1)
+                }
+                disabled={currentPage === 1}
+                aria-label="前のページ"
+              >
+                ＜
+              </button>
 
-                ) : (
+              <div className="list-cards">
 
-                  <div className="denpa-list">
+                {conditionMode === 'register' ? (
+                  <div className="condition-register">
+                    <h3>現在の検索条件をお気に入り登録できます</h3>
 
-                    {paginatedSearchResults.map(
-                      (result) => {
+                    <label>
+                      登録名：
+                      <input
+                        type="text"
+                        value={conditionName}
+                        onChange={(e) => setConditionName(e.target.value)}
+                      />
+                    </label>
 
-                        const denpa = result.denpa
-                        const match = result.match
-
-                        const getMatchClass =
-                          (field: string) => {
-                            if (
-                              match.required.includes(
-                                field
-                              )
-                            ) {
-                              return 'search-match search-match-required'
-                            }
-
-                            if (
-                              match.optional.includes(
-                                field
-                              )
-                            ) {
-                              return 'search-match search-match-optional'
-                            }
-
-                            return ''
+                    <div className="condition-register-buttons">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (conditionName.trim() === '') {
+                            alert('登録名を入力してください')
+                            return
                           }
 
-                        return (
-                          <div
-                            className="denpa-card"
-                            key={denpa.id}
-                          >
+                          const newCondition: SearchCondition = {
+                            id: crypto.randomUUID(),
+                            name: conditionName.trim(),
+                            uuid,
+                            searchName: name,
+                            evasion,
+                            body,
+                            colorCategory,
+                            color,
+                            head,
+                            antennaCategory,
+                            antenna,
+                            feature,
+                            nameRequired,
+                            evasionRequired,
+                            bodyRequired,
+                            colorRequired,
+                            headRequired,
+                            antennaRequired,
+                            featureRequired,
+                            optionalMin,
+                            createdAt: Date.now(),
+                          }
 
-                            <div className="denpa-info">
+                          console.log('newCondition作成直後:', newCondition)
 
-                              <div className="name-uuid-row">
+                          setSearchConditions((currentConditions) => {
+                            const updatedConditions = [
+                              ...currentConditions,
+                              newCondition,
+                            ]
+
+                            console.log('登録するnewCondition:', newCondition)
+                            console.log('登録するoptionalMin:', newCondition.optionalMin)
+
+                            localStorage.setItem(
+                              'searchConditions',
+                              JSON.stringify(updatedConditions)
+                            )
+
+                            console.log(
+                              'localStorage保存後:',
+                              JSON.parse(localStorage.getItem('searchConditions') || '[]')
+                            )
+
+                            return updatedConditions
+                          })
+
+                          setConditionName('')
+                          setConditionMode('none')
+
+                          alert('検索条件をお気に入り登録しました')
+                        }}
+                      >
+                        登録する
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConditionName('')
+                          setConditionMode('none')
+                        }}
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
+                ) : conditionMode === 'load' ? (
+                  <div className="condition-load">
+                    <div className="condition-load-sort">
+                      <label>
+                        並び順：
+                        <select
+                          value={conditionSort}
+                          onChange={(event) =>
+                            setConditionSort(
+                              event.target.value as 'new' | 'old' | 'name'
+                            )
+                          }
+                        >
+                          <option value="new">新しい順</option>
+                          <option value="old">古い順</option>
+                          <option value="name">登録名順</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="condition-load-content">
+                      <div className="condition-load-list">
+                        {searchConditions.length === 0 ? (
+                          <p>登録した検索条件はありません。</p>
+                        ) : (
+                          [...searchConditions]
+                            .sort((a, b) => {
+                              if (conditionSort === 'new') {
+                                return b.createdAt - a.createdAt
+                              }
+
+                              if (conditionSort === 'old') {
+                                return a.createdAt - b.createdAt
+                              }
+
+                              return a.name.localeCompare(b.name, 'ja')
+                            })
+                            .map((condition) => (
+                              <div
+                                key={condition.id}
+                                className="condition-load-item"
+                              >
+                                <button
+                                  type="button"
+                                  className="condition-load-item-name"
+                                  onClick={() => {
+                                    setSelectedConditionId(condition.id)
+                                    setEditingConditionName(condition.name)
+                                  }}
+                                >
+                                  {condition.name}
+                                </button>
 
                                 <button
                                   type="button"
-                                  className={`favorite-star ${denpa.favorite
-                                    ? 'active'
-                                    : ''
-                                    }`}
+                                  className="condition-load-delete-button"
                                   onClick={() => {
-                                    setDenpaList(
-                                      (currentList) =>
-                                        currentList.map(
-                                          (item) =>
-                                            item.id ===
-                                              denpa.id
-                                              ? {
-                                                ...item,
-                                                favorite:
-                                                  !item.favorite,
-                                              }
-                                              : item
-                                        )
+                                    const shouldDelete = window.confirm(
+                                      `「${condition.name}」を削除しますか？`
                                     )
-                                  }}
-                                  aria-label="お気に入り"
-                                  title="お気に入り"
-                                >
-                                  ★
-                                </button>
 
-                                <h3 className="denpa-name">
-                                  <span
-                                    className={getMatchClass(
-                                      '名前'
-                                    )}
-                                  >
-                                    {denpa.name ||
-                                      '名前未設定'}
-                                  </span>
-                                </h3>
+                                    if (!shouldDelete) {
+                                      return
+                                    }
 
-                              </div>
-
-                              <p className="denpa-status">
-                                回避率：
-                                <span
-                                  className={getMatchClass(
-                                    '回避率'
-                                  )}
-                                >
-                                  {denpa.evasion ||
-                                    '未設定'}
-                                </span>
-                              </p>
-
-                              <p className="denpa-status">
-                                体格：
-                                <span
-                                  className={getMatchClass(
-                                    '体格'
-                                  )}
-                                >
-                                  {denpa.body ||
-                                    '未設定'}
-                                </span>
-                              </p>
-
-                              <p className="denpa-status">
-                                色：
-                                <span
-                                  className={getMatchClass(
-                                    '色'
-                                  )}
-                                >
-                                  {denpa.colorCategory || '未設定'}
-                                  {' ＞ '}
-                                  {denpa.color || '未設定'}
-                                </span>
-                              </p>
-
-                              <p className="denpa-status">
-                                頭：
-                                <span
-                                  className={getMatchClass(
-                                    '頭'
-                                  )}
-                                >
-                                  {denpa.head ||
-                                    '未設定'}
-                                </span>
-                              </p>
-
-                              <p className="denpa-status">
-                                アンテナ：
-                                <span
-                                  className={getMatchClass(
-                                    'アンテナ'
-                                  )}
-                                >
-                                  {denpa.antennaCategory || '未設定'}
-                                  {' ＞ '}
-                                  {denpa.antenna || '未設定'}
-                                </span>
-                              </p>
-
-                              <p className="denpa-status">
-                                特徴：
-                                <span
-                                  className={getMatchClass(
-                                    '特徴'
-                                  )}
-                                >
-                                  {denpa.feature ||
-                                    '未設定'}
-                                </span>
-                              </p>
-
-                            </div>
-
-                            <div className="card-side">
-
-                              <div className="qr-area">
-
-                                <div className="denpa-uuid">
-
-                                  <span>
-                                    UUID: {denpa.id.slice(0, 12)}...
-                                  </span>
-
-                                  <button
-                                    type="button"
-                                    className="copy-button"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(denpa.id)
-                                      alert('UUIDをコピーしました')
-                                    }}
-                                    aria-label="UUIDをコピー"
-                                    title="UUIDをコピー"
-                                  >
-                                    <svg
-                                      width="20"
-                                      height="20"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      aria-hidden="true"
-                                    >
-                                      <rect
-                                        x="9"
-                                        y="9"
-                                        width="11"
-                                        height="11"
-                                        rx="2"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      />
-
-                                      <path
-                                        d="M15 9V6C15 4.89543 14.1046 4 13 4H6C4.89543 4 4 4.89543 4 6V13C4 14.1046 4.89543 15 6 15H9"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      />
-                                    </svg>
-                                  </button>
-
-                                </div>
-
-
-                                <div
-                                  className={`qr-image-wrapper ${denpa.capture ? 'captured' : ''
-                                    }`}
-                                  onClick={() => {
-                                    setDenpaList((currentList) =>
-                                      currentList.map((item) =>
-                                        item.id === denpa.id
-                                          ? {
-                                            ...item,
-                                            capture: !item.capture,
-                                          }
-                                          : item
+                                    setSearchConditions((currentConditions) => {
+                                      const updatedConditions = currentConditions.filter(
+                                        (item) => item.id !== condition.id
                                       )
-                                    )
-                                  }}
-                                >
-                                  <img
-                                    className="list-qr"
-                                    src={
-                                      denpa.qrFile
-                                        ? URL.createObjectURL(denpa.qrFile)
-                                        : '/denpa-qr-web/no-image.jpg'
-                                    }
-                                    alt={
-                                      denpa.qrFile
-                                        ? `${denpa.name}のQRコード`
-                                        : 'QR画像なし'
-                                    }
-                                  />
 
-                                  <button
-                                    type="button"
-                                    className="qr-expand-button"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      setExpandedQr(denpa)
-                                    }}
-                                    aria-label="QRコードを拡大"
-                                    title="QRコードを拡大"
-                                  >
-                                    ⛶
-                                  </button>
+                                      localStorage.setItem(
+                                        'searchConditions',
+                                        JSON.stringify(updatedConditions)
+                                      )
 
-                                  {denpa.capture && (
-                                    <div className="captured-label">
-                                      捕獲済み
-                                    </div>
-                                  )}
-                                </div>
-
-                              </div>
-
-
-                              <div className="card-buttons">
-
-                                <button
-                                  type="button"
-                                  className="edit-button"
-                                  onClick={() =>
-                                    navigate(`/edit/${denpa.id}`, {
-                                      state: {
-                                        from: 'search', searchPageState: {
-                                          uuid,
-                                          name,
-                                          evasion,
-                                          body,
-                                          colorCategory,
-                                          color,
-                                          head,
-                                          antennaCategory,
-                                          antenna,
-                                          feature,
-                                          captureSearch,
-                                          favoriteSearch,
-                                          sortMode,
-                                          currentPage,
-                                          itemsPerPage,
-                                          nameRequired,
-                                          evasionRequired,
-                                          bodyRequired,
-                                          colorRequired,
-                                          headRequired,
-                                          antennaRequired,
-                                          featureRequired,
-                                          optionalMin,
-                                        } satisfies SearchPageState,
-                                      },
+                                      return updatedConditions
                                     })
-                                  }
-                                >
 
-                                  <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    aria-hidden="true"
-                                  >
-                                    <path
-                                      d="M4 20H8L19 9C20.1 7.9 20.1 6.1 19 5C17.9 3.9 16.1 3.9 15 5L4 16V20Z"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
+                                    if (selectedConditionId === condition.id) {
+                                      setSelectedConditionId(null)
+                                      setEditingConditionName('')
+                                    }
 
-                                    <path
-                                      d="M13.5 6.5L17.5 10.5"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                    />
-                                  </svg>
-                                </button>
-
-
-                                <button
-                                  type="button"
-                                  className="delete-button"
-                                  onClick={() =>
-                                    handleDelete(denpa.id)
-                                  }
+                                  }}
+                                  aria-label={`${condition.name}を削除`}
+                                  title="検索条件を削除"
                                 >
                                   <svg
                                     width="18"
@@ -4544,69 +3922,734 @@ function Search({
                                     />
                                   </svg>
                                 </button>
-
                               </div>
+                            ))
+                        )}
+                      </div>
 
-                            </div>
+                      <div className="condition-load-detail">
+                        {selectedConditionId === null ? (
+                          <p>検索条件を選択してください。</p>
+                        ) : (
+                          (() => {
+                            const selectedCondition = searchConditions.find(
+                              (condition) => condition.id === selectedConditionId
+                            )
 
-                          </div>
-                        )
-                      }
-                    )}
+                            if (!selectedCondition) {
+                              return <p>検索条件を選択してください。</p>
+                            }
+
+                            return (
+                              <>
+                                <div className="condition-load-name">
+                                  <input
+                                    type="text"
+                                    value={editingConditionName}
+                                    onChange={(event) => setEditingConditionName(event.target.value)}
+                                  />
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (editingConditionName.trim() === '') {
+                                        alert('登録名を入力してください')
+                                        return
+                                      }
+
+                                      setSearchConditions((currentConditions) => {
+                                        const updatedConditions = currentConditions.map((condition) =>
+                                          condition.id === selectedCondition.id
+                                            ? {
+                                              ...condition,
+                                              name: editingConditionName.trim(),
+                                            }
+                                            : condition
+                                        )
+
+                                        localStorage.setItem(
+                                          'searchConditions',
+                                          JSON.stringify(updatedConditions)
+                                        )
+
+                                        return updatedConditions
+                                      })
+
+                                      alert('登録名を変更しました')
+                                    }}
+                                  >
+                                    登録名を変更
+                                  </button>
+
+                                </div>
+
+                                <div className="condition-preview">
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">UUID</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span className="condition-preview-value">
+                                      {selectedCondition.uuid || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">名前</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span
+                                      className={
+                                        selectedCondition.searchName
+                                          ? selectedCondition.nameRequired
+                                            ? 'search-match search-match-required'
+                                            : 'search-match search-match-optional'
+                                          : 'condition-preview-value'
+                                      }
+                                    >
+                                      {selectedCondition.searchName || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">回避率</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span
+                                      className={
+                                        selectedCondition.evasion
+                                          ? selectedCondition.evasionRequired
+                                            ? 'search-match search-match-required'
+                                            : 'search-match search-match-optional'
+                                          : 'condition-preview-value'
+                                      }
+                                    >
+                                      {selectedCondition.evasion || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">体格</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span
+                                      className={
+                                        selectedCondition.body
+                                          ? selectedCondition.bodyRequired
+                                            ? 'search-match search-match-required'
+                                            : 'search-match search-match-optional'
+                                          : 'condition-preview-value'
+                                      }
+                                    >
+                                      {selectedCondition.body || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">色</span>
+                                    <span className="condition-preview-colon">：</span>
+
+                                    {(selectedCondition.colorCategory || selectedCondition.color) ? (
+                                      <>
+                                        <span
+                                          className={
+                                            selectedCondition.colorRequired
+                                              ? 'search-match search-match-required'
+                                              : 'search-match search-match-optional'
+                                          }
+                                        >
+                                          {selectedCondition.colorCategory || '指定なし'}
+                                        </span>
+
+                                        <span>　＞　</span>
+
+                                        <span
+                                          className={
+                                            selectedCondition.colorRequired
+                                              ? 'search-match search-match-required'
+                                              : 'search-match search-match-optional'
+                                          }
+                                        >
+                                          {selectedCondition.color || '指定なし'}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="condition-preview-value">
+                                        指定なし
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">頭</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span
+                                      className={
+                                        selectedCondition.head
+                                          ? selectedCondition.headRequired
+                                            ? 'search-match search-match-required'
+                                            : 'search-match search-match-optional'
+                                          : 'condition-preview-value'
+                                      }
+                                    >
+                                      {selectedCondition.head || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">アンテナ</span>
+                                    <span className="condition-preview-colon">：</span>
+
+                                    {(selectedCondition.antennaCategory || selectedCondition.antenna) ? (
+                                      <>
+                                        <span
+                                          className={
+                                            selectedCondition.antennaRequired
+                                              ? 'search-match search-match-required'
+                                              : 'search-match search-match-optional'
+                                          }
+                                        >
+                                          {selectedCondition.antennaCategory || '指定なし'}
+                                        </span>
+
+                                        <span>　＞　</span>
+
+                                        <span
+                                          className={
+                                            selectedCondition.antennaRequired
+                                              ? 'search-match search-match-required'
+                                              : 'search-match search-match-optional'
+                                          }
+                                        >
+                                          {selectedCondition.antenna || '指定なし'}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="condition-preview-value">
+                                        指定なし
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="condition-preview-row">
+                                    <span className="condition-preview-label">特徴</span>
+                                    <span className="condition-preview-colon">：</span>
+                                    <span
+                                      className={
+                                        selectedCondition.feature
+                                          ? selectedCondition.featureRequired
+                                            ? 'search-match search-match-required'
+                                            : 'search-match search-match-optional'
+                                          : 'condition-preview-value'
+                                      }
+                                    >
+                                      {selectedCondition.feature || '指定なし'}
+                                    </span>
+                                  </div>
+
+                                  <div className="condition-preview-optional-min">
+                                    任意項目：{selectedCondition.optionalMin}個以上一致
+                                  </div>
+                                </div>
+
+                                <button className='condition-apply-button'
+                                  type="button"
+                                  onClick={() => {
+                                    setUuid(selectedCondition.uuid)
+                                    setName(selectedCondition.searchName)
+                                    setEvasion(selectedCondition.evasion)
+                                    setBody(selectedCondition.body)
+                                    setColorCategory(selectedCondition.colorCategory)
+                                    setColor(selectedCondition.color)
+                                    setHead(selectedCondition.head)
+                                    setAntennaCategory(selectedCondition.antennaCategory)
+                                    setAntenna(selectedCondition.antenna)
+                                    setFeature(selectedCondition.feature)
+
+                                    setNameRequired(selectedCondition.nameRequired)
+                                    setEvasionRequired(selectedCondition.evasionRequired)
+                                    setBodyRequired(selectedCondition.bodyRequired)
+                                    setColorRequired(selectedCondition.colorRequired)
+                                    setHeadRequired(selectedCondition.headRequired)
+                                    setAntennaRequired(selectedCondition.antennaRequired)
+                                    setFeatureRequired(selectedCondition.featureRequired)
+
+                                    setOptionalMin(selectedCondition.optionalMin)
+
+                                    setConditionMode('none')
+                                    setSelectedConditionId(null)
+                                  }}
+                                >
+                                  この検索条件を適用する
+                                </button>
+
+                              </>
+                            )
+                          })()
+                        )}
+                      </div>
+                    </div>
 
                   </div>
+                ) : (
+                  <>
 
+                    {searchResults.length === 0 ? (
+
+                      <p>条件に一致する電波人間はいません。</p>
+
+                    ) : (
+
+                      <div className="denpa-list">
+
+                        {paginatedSearchResults.map(
+                          (result) => {
+
+                            const denpa = result.denpa
+                            const match = result.match
+
+                            const getMatchClass =
+                              (field: string) => {
+                                if (
+                                  match.required.includes(
+                                    field
+                                  )
+                                ) {
+                                  return 'search-match search-match-required'
+                                }
+
+                                if (
+                                  match.optional.includes(
+                                    field
+                                  )
+                                ) {
+                                  return 'search-match search-match-optional'
+                                }
+
+                                return ''
+                              }
+
+                            return (
+                              <div
+                                className="denpa-card"
+                                key={denpa.id}
+                              >
+
+                                <div className="denpa-info">
+
+                                  <div className="name-uuid-row">
+
+                                    <button
+                                      type="button"
+                                      className={`favorite-star ${denpa.favorite
+                                        ? 'active'
+                                        : ''
+                                        }`}
+                                      onClick={() => {
+                                        setDenpaList(
+                                          (currentList) =>
+                                            currentList.map(
+                                              (item) =>
+                                                item.id ===
+                                                  denpa.id
+                                                  ? {
+                                                    ...item,
+                                                    favorite:
+                                                      !item.favorite,
+                                                  }
+                                                  : item
+                                            )
+                                        )
+                                      }}
+                                      aria-label="お気に入り"
+                                      title="お気に入り"
+                                    >
+                                      ★
+                                    </button>
+
+                                    <h3 className="denpa-name">
+                                      <span
+                                        className={getMatchClass(
+                                          '名前'
+                                        )}
+                                      >
+                                        {denpa.name ||
+                                          '名前未設定'}
+                                      </span>
+                                    </h3>
+
+                                  </div>
+
+                                  <p className="denpa-status">
+                                    回避率：
+                                    <span
+                                      className={getMatchClass(
+                                        '回避率'
+                                      )}
+                                    >
+                                      {denpa.evasion ||
+                                        '未設定'}
+                                    </span>
+                                  </p>
+
+                                  <p className="denpa-status">
+                                    体格：
+                                    <span
+                                      className={getMatchClass(
+                                        '体格'
+                                      )}
+                                    >
+                                      {denpa.body ||
+                                        '未設定'}
+                                    </span>
+                                  </p>
+
+                                  <p className="denpa-status">
+                                    色：
+                                    <span
+                                      className={getMatchClass(
+                                        '色'
+                                      )}
+                                    >
+                                      {denpa.colorCategory || '未設定'}
+                                      {' ＞ '}
+                                      {denpa.color || '未設定'}
+                                    </span>
+                                  </p>
+
+                                  <p className="denpa-status">
+                                    頭：
+                                    <span
+                                      className={getMatchClass(
+                                        '頭'
+                                      )}
+                                    >
+                                      {denpa.head ||
+                                        '未設定'}
+                                    </span>
+                                  </p>
+
+                                  <p className="denpa-status">
+                                    アンテナ：
+                                    <span
+                                      className={getMatchClass(
+                                        'アンテナ'
+                                      )}
+                                    >
+                                      {denpa.antennaCategory || '未設定'}
+                                      {' ＞ '}
+                                      {denpa.antenna || '未設定'}
+                                    </span>
+                                  </p>
+
+                                  <p className="denpa-status">
+                                    特徴：
+                                    <span
+                                      className={getMatchClass(
+                                        '特徴'
+                                      )}
+                                    >
+                                      {denpa.feature ||
+                                        '未設定'}
+                                    </span>
+                                  </p>
+
+                                </div>
+
+                                <div className="card-side">
+
+                                  <div className="qr-area">
+
+                                    <div className="denpa-uuid">
+
+                                      <span>
+                                        UUID: {denpa.id.slice(0, 12)}...
+                                      </span>
+
+                                      <button
+                                        type="button"
+                                        className="copy-button"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(denpa.id)
+                                          alert('UUIDをコピーしました')
+                                        }}
+                                        aria-label="UUIDをコピー"
+                                        title="UUIDをコピー"
+                                      >
+                                        <svg
+                                          width="20"
+                                          height="20"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          aria-hidden="true"
+                                        >
+                                          <rect
+                                            x="9"
+                                            y="9"
+                                            width="11"
+                                            height="11"
+                                            rx="2"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                          />
+
+                                          <path
+                                            d="M15 9V6C15 4.89543 14.1046 4 13 4H6C4.89543 4 4 4.89543 4 6V13C4 14.1046 4.89543 15 6 15H9"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                          />
+                                        </svg>
+                                      </button>
+
+                                    </div>
+
+
+                                    <div
+                                      className={`qr-image-wrapper ${denpa.capture ? 'captured' : ''
+                                        }`}
+                                      onClick={() => {
+                                        setDenpaList((currentList) =>
+                                          currentList.map((item) =>
+                                            item.id === denpa.id
+                                              ? {
+                                                ...item,
+                                                capture: !item.capture,
+                                              }
+                                              : item
+                                          )
+                                        )
+                                      }}
+                                    >
+                                      <img
+                                        className="list-qr"
+                                        src={
+                                          denpa.qrFile
+                                            ? URL.createObjectURL(denpa.qrFile)
+                                            : '/denpa-qr-web/no-image.jpg'
+                                        }
+                                        alt={
+                                          denpa.qrFile
+                                            ? `${denpa.name}のQRコード`
+                                            : 'QR画像なし'
+                                        }
+                                      />
+
+                                      <button
+                                        type="button"
+                                        className="qr-expand-button"
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          setExpandedQr(denpa)
+                                        }}
+                                        aria-label="QRコードを拡大"
+                                        title="QRコードを拡大"
+                                      >
+                                        ⛶
+                                      </button>
+
+                                      {denpa.capture && (
+                                        <div className="captured-label">
+                                          捕獲済み
+                                        </div>
+                                      )}
+                                    </div>
+
+                                  </div>
+
+
+                                  <div className="card-buttons">
+
+                                    <button
+                                      type="button"
+                                      className="edit-button"
+                                      onClick={() =>
+                                        navigate(`/edit/${denpa.id}`, {
+                                          state: {
+                                            from: 'search', searchPageState: {
+                                              uuid,
+                                              name,
+                                              evasion,
+                                              body,
+                                              colorCategory,
+                                              color,
+                                              head,
+                                              antennaCategory,
+                                              antenna,
+                                              feature,
+                                              captureSearch,
+                                              favoriteSearch,
+                                              sortMode,
+                                              currentPage,
+                                              itemsPerPage,
+                                              nameRequired,
+                                              evasionRequired,
+                                              bodyRequired,
+                                              colorRequired,
+                                              headRequired,
+                                              antennaRequired,
+                                              featureRequired,
+                                              optionalMin,
+                                            } satisfies SearchPageState,
+                                          },
+                                        })
+                                      }
+                                    >
+
+                                      <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                      >
+                                        <path
+                                          d="M4 20H8L19 9C20.1 7.9 20.1 6.1 19 5C17.9 3.9 16.1 3.9 15 5L4 16V20Z"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+
+                                        <path
+                                          d="M13.5 6.5L17.5 10.5"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                        />
+                                      </svg>
+                                    </button>
+
+
+                                    <button
+                                      type="button"
+                                      className="delete-button"
+                                      onClick={() =>
+                                        handleDelete(denpa.id)
+                                      }
+                                    >
+                                      <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                      >
+                                        <path
+                                          d="M5 7H19"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                        />
+
+                                        <path
+                                          d="M10 7V5H14V7"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+
+                                        <path
+                                          d="M8 7L9 20H15L16 7"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+
+                                        <path
+                                          d="M10 11V16"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                        />
+
+                                        <path
+                                          d="M14 11V16"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                        />
+                                      </svg>
+                                    </button>
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+                            )
+                          }
+                        )}
+
+                      </div>
+
+                    )}
+
+                  </>
                 )}
 
-              </>
-            )}
+              </div>
 
-          </div>
-
-        </section>
-
-        {expandedQr && (
-          <div
-            className="qr-modal-overlay"
-            onClick={() => setExpandedQr(null)}
-          >
-            <div
-              className="qr-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
               <button
                 type="button"
-                className="qr-modal-close"
-                onClick={() => setExpandedQr(null)}
-                aria-label="閉じる"
-                title="閉じる"
+                className="card-pagination-button card-pagination-next"
+                onClick={() =>
+                  setCurrentPage((page) => page + 1)
+                }
+                disabled={
+                  currentPage === totalPages ||
+                  totalPages === 0
+                }
+                aria-label="次のページ"
               >
-                ×
+                ＞
               </button>
 
-              <img
-                className="qr-modal-image"
-                src={
-                  expandedQr.qrFile
-                    ? URL.createObjectURL(expandedQr.qrFile)
-                    : '/denpa-qr-web/no-image.jpg'
-                }
-                alt={
-                  expandedQr.qrFile
-                    ? `${expandedQr.name}のQRコード`
-                    : 'QR画像なし'
-                }
-              />
+            </div>
 
-              <div className="qr-modal-name">
-                {expandedQr.name || '名前未設定'}
+          </section>
+
+          {expandedQr && (
+            <div
+              className="qr-modal-overlay"
+              onClick={() => setExpandedQr(null)}
+            >
+              <div
+                className="qr-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="qr-modal-close"
+                  onClick={() => setExpandedQr(null)}
+                  aria-label="閉じる"
+                  title="閉じる"
+                >
+                  ×
+                </button>
+
+                <img
+                  className="qr-modal-image"
+                  src={
+                    expandedQr.qrFile
+                      ? URL.createObjectURL(expandedQr.qrFile)
+                      : '/denpa-qr-web/no-image.jpg'
+                  }
+                  alt={
+                    expandedQr.qrFile
+                      ? `${expandedQr.name}のQRコード`
+                      : 'QR画像なし'
+                  }
+                />
+
+                <div className="qr-modal-name">
+                  {expandedQr.name || '名前未設定'}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-      </main>
-
+        </main>
+      </div>
     </div>
   )
 }
