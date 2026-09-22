@@ -1007,11 +1007,29 @@ const BODY_TABLE_EXCEPTIONS: Record<string, string> = {
 }
 
 function Header() {
+  const location = useLocation()
+
+  let breadcrumb = ''
+
+  if (location.pathname === '/save') {
+    breadcrumb += ' ＞ 電波人間を登録'
+  } else if (location.pathname === '/search') {
+    breadcrumb += ' ＞ 電波人間を検索'
+  } else if (location.pathname.startsWith('/edit/')) {
+    breadcrumb += ' ＞ 電波人間を検索 ＞ データ編集'
+  } else if (location.pathname === '/qr-history') {
+    breadcrumb += ' ＞ 電波人間を登録 ＞ QRコード生成履歴（直近300個）'
+  }
+
   return (
     <header className="site-header">
       <Link to="/" className="site-title">
         電波人間 QRコード管理ツール
       </Link>
+
+      <div className="header-breadcrumb">
+        {breadcrumb}
+      </div>
 
       <nav className="site-nav">
         <Link to="/">ホーム</Link>
@@ -1048,6 +1066,11 @@ function Home({
         <div className="home-column home-data-column">
           <div className="home-backup">
             <h2 className="home-data-title">データ管理</h2>
+
+            <p>
+              端末変更やブラウザのデータ削除に備えて、<br></br>
+              定期的にバックアップを作成することを推奨します。
+            </p>
 
             <div className="home-data-section">
               <p>バックアップファイルをダウンロードします。</p>
@@ -1129,7 +1152,8 @@ function Home({
 
             <p>
               電波人間のステータスとQRコードを登録し、
-              条件を指定して検索できる管理ツールです。
+              条件を指定して検索できる管理ツールです。<br></br>
+              登録した電波人間の情報やQRコード画像は、お使いのブラウザ内に保存されます。
             </p>
           </div>
 
@@ -1141,7 +1165,8 @@ function Home({
               </Link>
 
               <p className="home-feature-description">
-                電波人間の名前やステータス、QRコードを登録できます。
+                電波人間の名前やステータス、QRコードを登録できます。<br></br>
+                QRコードを生成することもできます。
               </p>
             </div>
 
@@ -1151,7 +1176,8 @@ function Home({
               </Link>
 
               <p className="home-feature-description">
-                登録した電波人間を条件から検索し、一覧で確認できます。
+                登録した電波人間を、条件を指定して検索できます。<br></br>
+                お気に入り、捕獲済みかどうかの指定もできます。
               </p>
             </div>
 
@@ -2114,13 +2140,15 @@ function Edit({
 
     if (unsetItems.length > 0) {
       const shouldUpdate = window.confirm(
-        `${unsetItems.join('、')}が設定されていません。\n\n更新しますか？`
+        `${unsetItems.join('、')}が設定されていません。\n\n編集しますか？`
       )
 
       if (!shouldUpdate) {
         return false
       }
     }
+
+    alert('電波人間のデータを編集しました。')
 
     setDenpaList((currentList) =>
       currentList.map((item) =>
@@ -2471,7 +2499,7 @@ function Edit({
                     })
                   }}
                 >
-                  更新して戻る
+                  編集して戻る
                 </button>
 
               </div>
