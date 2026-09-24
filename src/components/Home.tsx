@@ -154,6 +154,27 @@ function Home({
               </p>
             </div>
 
+            <div className="home-menu-item">
+              <div className="home-development-button-wrapper">
+                <button
+                    type="button"
+                    className="home-main-button home-development-button"
+                    disabled
+                >
+                    🧬 出生ルートを登録
+                </button>
+
+                <span className="home-development-badge">
+                    開発中
+                </span>
+              </div>
+
+              <p className="home-feature-description">
+                出生ルートを保存・管理できます。<br></br>
+                現在開発中です。
+              </p>
+            </div>
+
           </div>
 
         </div>

@@ -11,6 +11,7 @@ import Save from './components/Save'
 import QrHistoryPage from './components/QrHistory'
 import Edit from './components/Edit'
 import Search from './components/Search'
+import BirthRoute from './components/BirthRoute'
 
 import type { DenpaData } from './types/denpa'
 import type { QrHistory as QrHistoryType } from './types/qr'
@@ -143,7 +144,14 @@ function App() {
             />
           }
         />
+
+        <Route
+          path="/birth-route"
+          element={<BirthRoute />}
+        />
+        
       </Routes>
+
     </BrowserRouter>
   )
 }
