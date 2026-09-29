@@ -4,7 +4,15 @@ import {
   Routes,
   Route,
 } from 'react-router-dom'
-import './App.css'
+
+import './styles/common.css'
+import './styles/Edit.css'
+import './styles/Header.css'
+import './styles/Home.css'
+import './styles/HowToUseModal.css'
+import './styles/QrHistory.css'
+import './styles/Save-and-Edit.css'
+import './styles/Search.css'
 
 import Home from './components/Home'
 import Save from './components/Save'

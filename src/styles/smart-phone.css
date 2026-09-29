@@ -1,0 +1,312 @@
+/* =========================
+   スマホ対応
+   ========================= */
+
+@media (max-width: 768px) {
+
+  /* ヘッダー */
+  .site-header {
+    min-height: auto;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .site-title {
+    font-size: 18px;
+  }
+
+  .header-breadcrumb {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    font-size: 13px;
+  }
+
+  .site-nav {
+    gap: 14px;
+    padding-left: 0;
+  }
+
+  .site-nav a,
+  .site-nav-button {
+    font-size: 14px;
+  }
+
+  /* ホーム */
+  .home {
+    width: calc(100% - 32px);
+    height: auto;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .home-data-column,
+  .home-main-column,
+  .home-future-column {
+    width: 100%;
+  }
+
+  .home-main-column {
+    order: 1;
+  }
+
+  .home-data-column {
+    order: 2;
+  }
+
+  .home-future-column {
+    display: none;
+  }
+
+  .home-feature-description {
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+  }
+
+  .home-backup {
+    width: 100%;
+  }
+
+  /* 登録画面 */
+  .save-page {
+    height: auto;
+    min-height: 0;
+  }
+
+  .save-layout {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .save-left {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .save-qr-area {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .save-input-area {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .save-body-table {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .body-table {
+    width: max-content;
+    min-width: 700px;
+  }
+
+  /* 登録画面：QRコード */
+  .save-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .qr-top-area {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .qr-mode-control {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .qr-mode-control select {
+    width: 80px;
+    max-width: 80px;
+    box-sizing: border-box;
+    font-size: 8px;
+    padding: 3px 6px;
+  }
+
+  .qr-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .qr-input input[type="file"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .qr-preview {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* QRコード生成 */
+  .qr-generate-area {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px;
+    column-gap: 12px;
+    align-items: start;
+  }
+
+  .qr-length-control {
+    grid-column: 1;
+  }
+
+  .qr-length-control select {
+    width: 40px;
+    max-width: 80px;
+    box-sizing: border-box;
+    font-size: 6px;
+    padding: 2px 5px;
+  }
+
+  .qr-length-control label {
+    font-size: 10px;
+  }
+
+  .qr-generate-buttons {
+    grid-column: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    position: static;
+    top: auto;
+    left: auto;
+  }
+
+  .qr-generate-buttons button {
+    min-height: 36px;
+    width: 50%;
+    padding: 2px 2px;
+    font-size: 13px;
+  }
+
+  .qr-generated-preview {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
+    position: static;
+    left: auto;
+    top: auto;
+    transform: none;
+
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .qr-generation-count {
+    margin: 0 0 6px;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .qr-generated-preview img.qr-generated-image {
+    display: block;
+    width: 100px;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+
+  .qr-generation-count {
+    margin: 8px 0 10px;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .qr-generated-image {
+    display: block;
+    width: 100px;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+
+  /* 登録フォーム */
+  .form {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-row>label {
+    flex: 0 0 60px;
+    width: 60px;
+    margin: 0;
+    text-align: left;
+  }
+
+  .form-row>input,
+  .form-row>select {
+    flex: 0 1 220px;
+    width: 220px;
+    max-width: 220px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .form-row>.select-group {
+    flex: 0 1 220px;
+    width: 220px;
+    max-width: 220px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .select-group {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .select-group select {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .form-buttons {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .save-button {
+    min-height: 44px;
+  }
+}

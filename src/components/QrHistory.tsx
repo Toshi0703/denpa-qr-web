@@ -44,7 +44,7 @@ function QrHistoryPage({
         <h2>QRコード生成履歴（直近300個）</h2>
 
         <span className="qr-history-page-number">
-          {page} / {totalPages || 1}
+          {page} / {totalPages || 1} ページ
         </span>
       </div>
 

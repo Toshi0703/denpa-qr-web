@@ -1,0 +1,103 @@
+/* =========================
+   Common
+========================= */
+
+.app {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dddddd;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.header h1 {
+  color: black;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.page {
+  width: min(700px, 90%);
+  margin: 50px auto;
+}
+
+.page h2 {
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 70%;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-row > label {
+  width: 30%;
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: #383838;
+}
+
+.form-row input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.select-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-group select {
+  padding: 8px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-row > select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-buttons {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.save-button {
+  width: 80%;
+  height: 50px;
+  margin-left: 10%;
+  color: black;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #eeeeee;
+}
