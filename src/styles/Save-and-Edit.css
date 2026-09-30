@@ -263,3 +263,113 @@
 .body-table-line-hover {
   background-color: #fff3cd;
 }
+
+@media (max-width: 1150px) {
+  .qr-generate-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: absolute;
+    top: -43px;
+    left: 25%;
+  }
+
+  .qr-generate-buttons button {
+    width: 160px;
+    padding: 5px 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .qr-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    background-color: #ffffff;
+    padding: 1px;
+  }
+
+  .qr-generated-preview {
+    position: absolute;
+    left: 65%;
+    top: -85%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .qr-generation-count {
+    left: 30%;
+    margin: -28% 0 0 0;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .save-input-area {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .save-input-area .form-row>select {
+    padding: 6px 8px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .save-input-area .form-row>input {
+    padding: 6px 8px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .save-input-area .select-group select {
+    padding: 6px 8px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 700px) {
+  .save-body-table {
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 20px;
+    border-left: 1px solid #cccccc;
+  }
+
+  .body-table-header h3 {
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .body-table-evasion label {
+    font-size: 12px;
+  }
+
+  .body-table-evasion select {
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .body-table {
+    width: 90%;
+    border-collapse: collapse;
+    font-size: 10px;
+    color: black;
+  }
+
+  .body-table th,
+  .body-table td {
+    border: 1px solid #cccccc;
+    padding: 1px 6px;
+    text-align: center;
+  }
+}
