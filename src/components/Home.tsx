@@ -2,6 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react'
 import { Link } from 'react-router-dom'
 import Header from './Header'
 import { PATCH_NOTES } from '../patchNotes'
+import { ANNOUNCEMENTS } from '../announcements'
 
 import {
   createBackupFile,
@@ -30,6 +31,33 @@ function Home({
   setSearchConditions: Dispatch<SetStateAction<SearchCondition[]>>
 }) {
   const [backupFile, setBackupFile] = useState<File | null>(null)
+  const [homeInfoTab, setHomeInfoTab] = useState<'patch' | 'announcement'>('patch')
+
+  const [lastViewedPatchNoteId, setLastViewedPatchNoteId] = useState(
+    () => localStorage.getItem('lastViewedPatchNoteId') ?? ''
+  )
+
+  const [lastViewedAnnouncementId, setLastViewedAnnouncementId] = useState(
+    () => localStorage.getItem('lastViewedAnnouncementId') ?? ''
+  )
+
+  const latestPatchNoteId =
+    PATCH_NOTES.length > 0
+      ? PATCH_NOTES[0].version
+      : ''
+
+  const latestAnnouncementId =
+    ANNOUNCEMENTS.length > 0
+      ? ANNOUNCEMENTS[0].id
+      : ''
+
+  const hasNewPatchNote =
+    latestPatchNoteId !== '' &&
+    latestPatchNoteId !== lastViewedPatchNoteId
+
+  const hasNewAnnouncement =
+    latestAnnouncementId !== '' &&
+    latestAnnouncementId !== lastViewedAnnouncementId
 
   return (
     <div className="app">
@@ -116,6 +144,50 @@ function Home({
               </div>
             </div>
           </div>
+
+          <div className="home-site-info">
+            <h2 className="home-site-info-title">
+              このサイトについて
+            </h2>
+
+            <p>
+              本サイトは、「New 電波人間のRPG FREE!」を元にした
+              非公式のファン制作ツールです。
+              ゲーム公式・運営元とは一切関係ありません。
+            </p>
+
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSehthL8D7VP7phxC3GslrwAYboR0HOs__rxX3m7OgNevZj42w/viewform?usp=publish-editor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="home-site-info-link"
+            >
+              バグ報告・要望フォーム
+            </a>
+
+            <Link
+              to="/terms"
+              className="home-site-info-link"
+            >
+              利用規約
+            </Link>
+
+            <Link
+              to="/privacy"
+              className="home-site-info-link"
+            >
+              プライバシーポリシー
+            </Link>
+
+            <Link
+              to="/rights"
+              className="home-site-info-link"
+            >
+              権利・ライセンスについて
+            </Link>
+
+          </div>
+
         </div>
 
         <div className="home-column home-main-column">
@@ -157,15 +229,15 @@ function Home({
             <div className="home-menu-item">
               <div className="home-development-button-wrapper">
                 <button
-                    type="button"
-                    className="home-main-button home-development-button"
-                    disabled
+                  type="button"
+                  className="home-main-button home-development-button"
+                  disabled
                 >
-                    🧬 出生ルートを登録
+                  🧬 出生ルートを登録
                 </button>
 
                 <span className="home-development-badge">
-                    開発中
+                  開発中
                 </span>
               </div>
 
@@ -181,25 +253,95 @@ function Home({
 
         <div className="home-column">
           <div className="home-patch-notes">
-            <h2 className="home-patch-notes-title">
-              パッチノート
-            </h2>
 
-            {PATCH_NOTES.map((note) => (
-              <div className="home-patch-note" key={note.version}>
-                <h3>{note.version}</h3>
+            <div className="home-info-tabs">
+              <button
+                type="button"
+                className={homeInfoTab === 'patch' ? 'active' : ''}
+                onClick={() => {
+                  setHomeInfoTab('patch')
 
-                <p className="home-patch-note-date">
-                  {note.date}
-                </p>
+                  const latestId =
+                    PATCH_NOTES.length > 0
+                      ? PATCH_NOTES[0].version
+                      : ''
 
-                <ul>
-                  {note.changes.map((change) => (
-                    <li key={change}>{change}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                  setLastViewedPatchNoteId(latestId)
+                  localStorage.setItem('lastViewedPatchNoteId', latestId)
+                }}
+              >
+                <span className="home-info-tab-label">
+                  パッチノート
+                  {hasNewPatchNote && (
+                    <span className="home-info-new-mark">NEW</span>
+                  )}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={homeInfoTab === 'announcement' ? 'active' : ''}
+                onClick={() => {
+                  setHomeInfoTab('announcement')
+
+                  const latestId =
+                    ANNOUNCEMENTS.length > 0
+                      ? ANNOUNCEMENTS[0].id
+                      : ''
+
+                  setLastViewedAnnouncementId(latestId)
+                  localStorage.setItem('lastViewedAnnouncementId', latestId)
+                }}
+              >
+                <span className="home-info-tab-label">
+                  お知らせ
+                  {hasNewAnnouncement && (
+                    <span className="home-info-new-mark">NEW</span>
+                  )}
+                </span>
+              </button>
+            </div>
+
+            {homeInfoTab === 'patch' && (
+              <>
+                {PATCH_NOTES.map((note) => (
+                  <div className="home-patch-note" key={note.version}>
+                    <h3>{note.version}</h3>
+
+                    <p className="home-patch-note-date">
+                      {note.date}
+                    </p>
+
+                    <ul>
+                      {note.changes.map((change) => (
+                        <li key={change}>{change}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {homeInfoTab === 'announcement' && (
+              <>
+                {ANNOUNCEMENTS.map((announcement) => (
+                  <div className="home-patch-note" key={announcement.id}>
+                    <h3>{announcement.title}</h3>
+
+                    <p className="home-patch-note-date">
+                      {announcement.date}
+                    </p>
+
+                    <ul>
+                      {announcement.body.map((text) => (
+                        <li key={text}>{text}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </>
+            )}
+
           </div>
         </div>
 

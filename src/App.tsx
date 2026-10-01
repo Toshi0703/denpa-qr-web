@@ -21,6 +21,10 @@ import Edit from './components/Edit'
 import Search from './components/Search'
 import BirthRoute from './components/BirthRoute'
 
+import Terms from './components/Terms'
+import Privacy from './components/Privacy'
+import Rights from './components/Rights'
+
 import type { DenpaData } from './types/denpa'
 import type { QrHistory as QrHistoryType } from './types/qr'
 import type { SearchCondition } from './types/search'
@@ -157,7 +161,19 @@ function App() {
           path="/birth-route"
           element={<BirthRoute />}
         />
-        
+
+        <Route
+          path="/terms"
+          element={<Terms />} />
+
+        <Route
+          path="/privacy"
+          element={<Privacy />} />
+
+        <Route
+          path="/rights"
+          element={<Rights />} />
+
       </Routes>
 
     </BrowserRouter>
