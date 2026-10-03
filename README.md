@@ -1,75 +1,62 @@
-# React + TypeScript + Vite
+# 電波人間 QRコード管理ツール
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+「New 電波人間のRPG FREE!」のQRコードや電波人間の情報を管理するための、非公式のファン制作Webツールです。
 
-Currently, two official plugins are available:
+## 🌐 公開サイト
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+https://toshi0703.github.io/denpa-qr-web/
 
-## React Compiler
+## 📖 このサイトについて
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+本サイトでは、電波人間の情報やQRコードをブラウザ上で管理できます。
 
-## Expanding the ESLint configuration
+主な機能は以下のとおりです。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 電波人間の情報登録
+- 登録した電波人間の一覧表示
+- 電波人間の検索
+- 登録データの編集・削除
+- 捕獲済み・お気に入り管理
+- QRコード画像の保存・表示
+- QRコード生成履歴の管理
+- 登録データのバックアップ・復元
+- 検索条件の保存
+- 出生ルートの登録（開発中）
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💾 データの保存について
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+登録した電波人間の情報やQRコード画像などのデータは、原則として利用者のブラウザ内に保存されます。
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+そのため、ブラウザのデータを削除した場合などには、登録データが失われる可能性があります。
 
-```
+必要に応じて、サイト内のバックアップ機能を利用してください。
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚠️ 注意事項
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+本サイトは「New 電波人間のRPG FREE!」を元にした、非公式のファン制作ツールです。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+ゲーム公式・運営元とは一切関係ありません。
 
-```
+ゲームに関する名称、画像、キャラクター、その他のコンテンツに関する権利は、それぞれの権利者に帰属します。
+
+## 🐛 バグ報告・要望
+
+バグ報告や機能への要望などがある場合は、サイト内の「バグ報告・要望フォーム」からご連絡ください。
+
+## 📄 関連ページ
+
+- [利用規約](https://toshi0703.github.io/denpa-qr-web/terms)
+- [プライバシーポリシー](https://toshi0703.github.io/denpa-qr-web/privacy)
+- [権利・ライセンスについて](https://toshi0703.github.io/denpa-qr-web/rights)
+
+## 🛠️ 使用技術
+
+- React
+- TypeScript
+- Vite
+- React Router
+- qrcode
+
+## 📜 ライセンス
+
+本サイトのソースコードおよび使用しているライブラリ等については、[権利・ライセンスについて](https://toshi0703.github.io/denpa-qr-web/rights)をご確認ください。
