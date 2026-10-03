@@ -228,13 +228,12 @@ function Home({
 
             <div className="home-menu-item">
               <div className="home-development-button-wrapper">
-                <button
-                  type="button"
+                <Link
+                  to="/birth-route"
                   className="home-main-button home-development-button"
-                  disabled
                 >
                   🧬 出生ルートを登録
-                </button>
+                </Link>
 
                 <span className="home-development-badge">
                   開発中
