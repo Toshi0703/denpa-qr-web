@@ -1,5 +1,6 @@
 import Header from './Header'
 import '../styles/BirthRoute.css'
+import { Link } from 'react-router-dom'
 
 function BirthRoute() {
   return (
@@ -7,18 +8,37 @@ function BirthRoute() {
       <Header />
 
       <main className="birth-route-page">
-        <h2>出生ルート</h2>
+        <div className="birth-route-list-page">
 
-        <div className="birth-route-header">
-          <p>登録済みの出生ルート</p>
+          <aside className="birth-route-sidebar">
+            <h2>出生ルート</h2>
 
-          <button type="button">
-            ＋ 新しく登録
-          </button>
-        </div>
+            <p>
+              ここに出生ルートの条件入力欄を作ります。
+            </p>
+          </aside>
 
-        <div className="birth-route-empty">
-          <p>登録されている出生ルートはありません。</p>
+          <section className="birth-route-content">
+
+            <div className="birth-route-pagination">
+              <h2>登録済み出生ルート</h2>
+
+              <Link
+                to="/birth-route/save"
+                className="birth-route-register-button"
+              >
+                ＋ 新しく出生ルートを登録
+              </Link>
+            </div>
+
+            <div className="birth-route-list">
+              <p>
+                ここに登録済みの出生ルートを表示します。
+              </p>
+            </div>
+
+          </section>
+
         </div>
       </main>
     </div>

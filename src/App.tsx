@@ -20,6 +20,7 @@ import QrHistoryPage from './components/QrHistory'
 import Edit from './components/Edit'
 import Search from './components/Search'
 import BirthRoute from './components/BirthRoute'
+import BirthRouteSave from './components/BirthRouteSave'
 
 import Terms from './components/Terms'
 import Privacy from './components/Privacy'
@@ -160,6 +161,11 @@ function App() {
         <Route
           path="/birth-route"
           element={<BirthRoute />}
+        />
+
+        <Route
+          path="/birth-route/save"
+          element={<BirthRouteSave />}
         />
 
         <Route
