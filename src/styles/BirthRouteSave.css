@@ -1,21 +1,159 @@
 .birth-route-save-page {
-  width: min(800px, 90%);
-  margin: 40px auto 60px;
-  padding: 28px 32px;
+  width: 100%;
+  height: calc(100vh - 69px);
+  overflow: hidden;
+}
+
+.birth-route-save-layout {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ========================================
+   左側：電波人間カード置き場
+   ======================================== */
+
+.birth-route-save-sidebar {
+  padding: 10px 14px;
+  border-right: 1px solid #cccccc;
+  overflow-y: auto;
+  color: black;
+}
+
+.birth-route-save-sidebar h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+}
+
+.birth-route-card-area {
+  min-height: 200px;
+  padding: 12px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.birth-route-card-area p {
+  margin: 0;
+  color: #777777;
+  font-size: 14px;
+}
+
+/* ========================================
+   右側：ワークベンチ
+   ======================================== */
+
+.birth-route-save-workbench {
+  display: grid;
+  grid-template-rows: 50px 1fr;
+  min-width: 0;
+  min-height: 0;
+  color: black;
+}
+
+.birth-route-save-workbench h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border-bottom: 1px solid #cccccc;
+  font-size: 20px;
+}
+
+.birth-route-workbench-area {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  background-color: #f5f5f5;
+}
+
+.birth-route-workbench-area p {
+  margin: 30px;
+  color: #777777;
+  font-size: 14px;
+}
+
+.birth-route-add-card-button {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.birth-route-add-card-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* ========================================
+   カード追加モーダル
+   ======================================== */
+
+.birth-route-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.birth-route-modal {
+  width: min(420px, 90%);
+  padding: 28px;
   box-sizing: border-box;
-  border: 1px solid #d5d5d5;
+  border: 1px solid #cccccc;
   border-radius: 12px;
   background-color: #ffffff;
   color: black;
 }
 
-.birth-route-save-page h2 {
-  margin: 0 0 20px;
-  font-size: 24px;
+.birth-route-modal h2 {
+  margin: 0 0 24px;
+  font-size: 20px;
   text-align: center;
+  color: black;
 }
 
-.birth-route-save-page p {
-  color: #555555;
+.birth-route-modal-button,
+.birth-route-modal-cancel-button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 10px;
+  border-radius: 6px;
   font-size: 14px;
+  cursor: pointer;
+}
+
+.birth-route-modal-button {
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+.birth-route-modal-button:hover {
+  background-color: #f0f0f0;
+}
+
+.birth-route-modal-cancel-button {
+  margin-top: 20px;
+  border: none;
+  background-color: transparent;
+  color: #666666;
+}
+
+.birth-route-modal-cancel-button:hover {
+  background-color: #f5f5f5;
 }
